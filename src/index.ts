@@ -50,6 +50,7 @@ import { TYPES } from "./types";
 import { bindDynamicModule } from "./utils";
 
 const locator = new Container();
+
 `.concat(
   imports
     .map(
@@ -57,7 +58,9 @@ const locator = new Container();
         `bindDynamicModule(TYPES.${abstraction}, () => import("${path}"));`
     )
     .join("\n")
-);
+).concat(`
+
+export { locator };`);
 
 try {
   await Promise.all([
