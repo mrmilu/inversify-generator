@@ -5,7 +5,7 @@ Generates the boilerplate code for an IoC container. Used for dependency injecti
 ## Usage
 
 ```bash
-mkdir out
+mkdir out ## Creates output directory
 npm run dev
 ```
 
@@ -18,4 +18,6 @@ npm run dev
 - [x] Implement syntax analysis
 - [x] Implement IoC boilerplate generation
 - [ ] Add command line arguments to configure the paths of the config file and the output directory.
+- [ ] Refactor code
+- [ ] Add tests
 - [ ] Publish to npm

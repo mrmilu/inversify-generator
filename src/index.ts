@@ -20,12 +20,14 @@ project.getSourceFiles().forEach((sourceFile) => {
     const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
     if (!hasDecorator) return;
 
-    const implementation = classDeclaration.getName() ?? "";
+    const className = classDeclaration.getName();
+    if (!className) return;
+
     const implement = classDeclaration.getImplements()[0];
     imports.push({
       path: sourceFile.getFilePath().replace(/^.*src/, "@/src"),
-      abstraction: implement?.getText() ?? implementation,
-      implementation,
+      abstraction: implement?.getText() ?? className,
+      implementation: className,
     });
   });
 });
