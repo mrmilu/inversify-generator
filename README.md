@@ -32,8 +32,8 @@ pnpm run dev # Runs program
 
 ## Dependencies
 
-`ts-morph`: Typescript AST analyser
-`yargs`: Command line arguments parser
+- `ts-morph`: Typescript AST analyser
+- `yargs`: Command line arguments parser
 
 ## Roadmap
 
