@@ -8,6 +8,7 @@ export function getDependencies(args: Partial<Args>) {
   const project = new Project({
     tsConfigFilePath: args.tsconfig,
   });
+  
   project.getSourceFiles().forEach((sourceFile) => {
     sourceFile.getClasses().forEach((classDeclaration) => {
       const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
@@ -24,5 +25,6 @@ export function getDependencies(args: Partial<Args>) {
       });
     });
   });
+
   return dependencies;
 }
