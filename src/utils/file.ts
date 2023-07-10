@@ -1,4 +1,4 @@
-import { writeFile } from 'fs';
+import { writeFile } from "fs";
 
 export function writeFilePromise(path: string, content: string): Promise<void> {
   return new Promise((resolve, reject) => {

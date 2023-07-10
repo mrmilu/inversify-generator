@@ -1,13 +1,14 @@
 {
   "compilerOptions": {
-    "target": "ESNext",                          
-    "module": "ESNext",                    
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "NodeNext",
     "allowJs": true,
-    "outDir": "build",                          
+    "outDir": "build",
     "rootDir": "src",
-    "strict": true,         
+    "strict": true,
     "noImplicitAny": true,
-    "esModuleInterop": true,
-  }
+    "esModuleInterop": true
+  },
+  "exclude": ["out", "build", "node_modules"]
 }
