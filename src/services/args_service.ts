@@ -1,4 +1,4 @@
-import { Args } from "../types/args.js";
+import type { Args } from "../types/args.js";
 import yargs from "yargs";
 import { readFileSync } from "fs";
 import { hideBin } from "yargs/helpers";
@@ -13,7 +13,8 @@ export class ArgsService {
     return [this.args, this.getConfigArgs(), this.getCliArgs()].map(this.removeFalsyValues).reduce((acc, curr) => ({ ...acc, ...curr }), {});
   }
 
-  private removeFalsyValues<T extends {}>(obj: T): Partial<T> {
+  private removeFalsyValues<T extends object>(obj: T): Partial<T> {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     return Object.fromEntries(Object.entries(obj).filter(([_, v]) => v)) as Partial<T>;
   }
 

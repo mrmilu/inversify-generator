@@ -10,7 +10,7 @@
     "prepare": "husky install",
     "build": "preconstruct build",
     "lint": "eslint --fix --ext js,ts,tsx src",
-    "check-types": "tsc --project tsconfig.json",
+    "check-types": "tsc --project tsconfig.json && rimraf build",
     "dev": "preconstruct watch",
     "postinstall": "pnpm prepare"
   },

@@ -9,7 +9,7 @@
     "strict": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "isolatedModules": true,
+    "isolatedModules": true
   },
-  "exclude": ["out", "build", "node_modules"]
+  "exclude": ["out", "build", "node_modules", "dist", "*.cjs"]
 }
