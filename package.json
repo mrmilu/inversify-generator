@@ -7,10 +7,14 @@
   "module": "dist/ioc-boilerplate-generator.esm.js",
   "scripts": {
     "start": "npm run build && node build/index.js",
+    "prepare": "husky install",
     "build": "preconstruct build",
-    "dev": "nodemon"
+    "lint": "eslint --fix --ext js,ts,tsx src",
+    "check-types": "tsc --project tsconfig.json",
+    "dev": "preconstruct watch",
+    "postinstall": "pnpm prepare"
   },
-  "author": "",
+  "author": "Mr.Milú",
   "license": "MIT",
   "dependencies": {
     "lodash": "~4.17.21",
@@ -24,8 +28,19 @@
     "@types/node": "~20.4.1",
     "@types/yargs": "~17.0.24",
     "nodemon": "~3.0.1",
+    "prettier": "^3.0.0",
     "rimraf": "~5.0.1",
     "ts-node": "~10.9.1",
-    "typescript": "~5.1.6"
+    "typescript": "~5.1.6",
+    "@typescript-eslint/eslint-plugin": "~6.0.0",
+    "@typescript-eslint/parser": "~6.0.0",
+    "eslint": "~8.44.0",
+    "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-unused-imports": "~3.0.0",
+    "@commitlint/cli": "~17.6.6",
+    "@commitlint/config-conventional": "~17.6.6",
+    "@commitlint/prompt-cli": "~17.6.6",
+    "husky": "~8.0.3",
+    "lint-staged": "~13.2.3"
   }
 }

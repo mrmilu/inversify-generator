@@ -1,30 +1,30 @@
-import { Project } from "ts-morph";
 import { Args } from "../types/args.js";
 import { Dependency } from "../types/dependency.js";
+import { Project } from "ts-morph";
 
-export function getDependencies(args: Partial<Args>) {
-  const dependencies: Dependency[] = [];
+export class DependenciesResolverService {
+  dependencies: Dependency[] = [];
 
-  new Project({ tsConfigFilePath: args.tsconfig })
-    .getSourceFiles()
-    .forEach((sourceFile) => {
+  constructor(args: Partial<Args>) {
+    this.getDependencies(args);
+  }
+
+  private getDependencies(args: Partial<Args>) {
+    new Project({ tsConfigFilePath: args.tsconfig }).getSourceFiles().forEach((sourceFile) => {
       sourceFile.getClasses().forEach((classDeclaration) => {
-        const hasDecorator = Boolean(
-          classDeclaration.getDecorator("injectable")
-        );
+        const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
         if (!hasDecorator) return;
 
         const className = classDeclaration.getName();
         if (!className) return;
 
         const implement = classDeclaration.getImplements()[0];
-        dependencies.push({
+        this.dependencies.push({
           path: sourceFile.getFilePath().replace(/^.*src/, "@/src"),
           abstraction: implement?.getText() ?? className,
-          implementation: className,
+          implementation: className
         });
       });
     });
-
-  return dependencies;
+  }
 }
