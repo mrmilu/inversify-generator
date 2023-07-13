@@ -1,4 +1,4 @@
-import type { Args } from "../types/args.js";
+import type { Args } from "../types/args";
 import yargs from "yargs";
 import { readFileSync } from "fs";
 import { hideBin } from "yargs/helpers";

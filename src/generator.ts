@@ -1,7 +1,7 @@
-import { writeIndexFile } from "./services/write_index.js";
-import { writeTypesFile } from "./services/write_types.js";
-import { ArgsService } from "./services/args_service.js";
-import { DependenciesResolverService } from "./services/dependencies_resolver_service.js";
+import { writeIndexFile } from "./services/write_index";
+import { writeTypesFile } from "./services/write_types";
+import { ArgsService } from "./services/args_service";
+import { DependenciesResolverService } from "./services/dependencies_resolver_service";
 
 async function run() {
   // TODO: CLI arguments

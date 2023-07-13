@@ -2,14 +2,14 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "ESNext",
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "node",
     "allowJs": true,
-    "outDir": "build",
-    "rootDir": "src",
     "strict": true,
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noEmit": true
   },
-  "exclude": ["out", "build", "node_modules", "dist", "*.cjs"]
+  "include": ["src"],
+  "exclude": ["out", "node_modules", "dist", "generator/dist", "*.cjs"]
 }

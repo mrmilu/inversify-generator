@@ -1,16 +1,17 @@
 {
   "name": "ioc-boilerplate-generator",
   "type": "module",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "IoC Boilerplate generator for dependency injection",
-  "main": "dist/ioc-boilerplate-generator.cjs.js",
-  "module": "dist/ioc-boilerplate-generator.esm.js",
+  "bin": {
+    "inversify-generator": "./bin.js"
+  },
   "scripts": {
     "start": "npm run build && node build/index.js",
     "prepare": "husky install",
     "build": "preconstruct build",
     "lint": "eslint --fix --ext js,ts,tsx src",
-    "check-types": "tsc --project tsconfig.json && rimraf build",
+    "check-types": "tsc --project tsconfig.json",
     "dev": "preconstruct watch",
     "postinstall": "pnpm prepare"
   },
@@ -20,6 +21,11 @@
     "lodash": "~4.17.21",
     "ts-morph": "~19.0.0",
     "yargs": "~17.7.2"
+  },
+  "preconstruct": {
+    "entrypoints": [
+      "./generator.ts"
+    ]
   },
   "devDependencies": {
     "@babel/core": "^7.22.8",

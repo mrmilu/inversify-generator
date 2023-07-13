@@ -1,9 +1,9 @@
-import { Args } from "../types/args.js";
-import { Dependency } from "../types/dependency.js";
+import type { Args } from "../types/args";
+import type { Dependency } from "../types/dependency";
 import { Project } from "ts-morph";
 
 export class DependenciesResolverService {
-  dependencies: Dependency[] = [];
+  dependencies: Array<Dependency> = [];
 
   constructor(args: Partial<Args>) {
     this.getDependencies(args);
