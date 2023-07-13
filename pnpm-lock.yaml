@@ -31,6 +31,9 @@ devDependencies:
   "@typescript-eslint/parser":
     specifier: ~6.0.0
     version: 6.0.0(eslint@8.44.0)(typescript@5.1.6)
+  chalk:
+    specifier: ~4.1.2
+    version: 4.1.2
   eslint:
     specifier: ~8.44.0
     version: 8.44.0
@@ -46,9 +49,6 @@ devDependencies:
   lint-staged:
     specifier: ~13.2.3
     version: 13.2.3
-  lodash:
-    specifier: ~4.17.21
-    version: 4.17.21
   nodemon:
     specifier: ~3.0.1
     version: 3.0.1

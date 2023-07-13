@@ -1,10 +1,9 @@
 import { DependenciesResolverService } from "./services/dependencies_resolver_service";
 import { WriterService } from "./services/writer_service";
-import { CliService } from "./services/cli_service";
+import cliService from "./services/cli_service";
 import { ConfigService } from "./services/config_service";
 
 async function run() {
-  const cliService = new CliService();
   const args = await cliService.args();
   const configService = new ConfigService(args);
 

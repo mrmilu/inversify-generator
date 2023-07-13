@@ -3,18 +3,19 @@ import { readFileSync } from "fs";
 
 const DEFAULT_CONFIG: Config = {
   tsconfig: "./tsconfig.json",
-  out: "./src/ioc"
+  output: "./src/ioc"
 };
 
 export class ConfigService {
-  config: Config;
+  config: Config = DEFAULT_CONFIG;
 
   constructor(args: Partial<Config> = {}) {
     this.config = this.init(args);
   }
 
   init(args: Partial<Config> = {}): Config {
-    return [args, this.config, this.getConfigFile()].map(this.removeFalsyValues).reduce<Config>((acc, curr) => ({ ...acc, ...curr }), DEFAULT_CONFIG);
+    const cleanConfigs = [args, this.getConfigFile()].map(this.removeFalsyValues);
+    return cleanConfigs.reduce<Config>((acc, curr) => ({ ...acc, ...curr }), this.config);
   }
 
   private removeFalsyValues<T extends object>(obj: T): Partial<T> {
