@@ -1,6 +1,5 @@
 {
   "name": "ioc-boilerplate-generator",
-  "type": "module",
   "version": "0.1.0",
   "description": "IoC Boilerplate generator for dependency injection",
   "bin": {
