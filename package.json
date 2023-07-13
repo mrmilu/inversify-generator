@@ -15,6 +15,7 @@
     "start": "npm run build && node build/index.js",
     "prepare": "husky install",
     "build": "preconstruct build",
+    "watch": "preconstruct watch",
     "lint": "eslint --fix --ext js,ts,tsx src",
     "check-types": "tsc --project tsconfig.json",
     "dev": "preconstruct watch",

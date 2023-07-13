@@ -1,15 +1,15 @@
-import type { Args } from "../types/args";
+import type { Config } from "../types/config";
 import type { Dependency } from "../types/dependency";
 import { Project } from "ts-morph";
 
 export class DependenciesResolverService {
   dependencies: Array<Dependency> = [];
 
-  constructor(args: Partial<Args>) {
-    this.getDependencies(args);
+  constructor(config: Config) {
+    this.getDependencies(config);
   }
 
-  private getDependencies(args: Partial<Args>) {
+  private getDependencies(args: Partial<Config>) {
     new Project({ tsConfigFilePath: args.tsconfig }).getSourceFiles().forEach((sourceFile) => {
       sourceFile.getClasses().forEach((classDeclaration) => {
         const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
