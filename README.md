@@ -11,7 +11,7 @@ Generates the boilerplate code for an IoC container. Used for dependency injecti
 
 These configuration options can be passed as command line arguments in the POSIX format, e.g. `--tsconfig ./tsconfig.json`.
 
-The configuration options can also be set in the `ioc-boilerplate-generator.json` config file, which is optional and must be located in the root directory of the project. The command line arguments take precedence over the config file. This is an example config file:
+The configuration options can also be set in the `inversify-generator.json` config file, which is optional and must be located in the root directory of the project. The command line arguments take precedence over the config file. This is an example config file:
 
 ```json
 {

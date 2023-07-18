@@ -26,7 +26,7 @@ export class ConfigService {
 
   private getConfigFile(): Partial<Config> {
     try {
-      const rawConfigFile = readFileSync("./ioc-boilerplate-generator.json", "utf8");
+      const rawConfigFile = readFileSync("./inversify-generator.json", "utf8");
       return JSON.parse(rawConfigFile);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (e: any) {

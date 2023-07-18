@@ -32,7 +32,7 @@ export class WriterService {
     let indexFileString: string = "";
 
     if (this.config.binding === "dynamic") {
-      indexFileString = DEFAULT_INDEX_FILE_TEMPLATE(`import { bindDynamicModule } from "ioc-boilerplate-generator/utils";`);
+      indexFileString = DEFAULT_INDEX_FILE_TEMPLATE(`import { bindDynamicModule } from "inversify-generator/utils";`);
       indexFileString = indexFileString.concat(
         this.dependencies.map(({ abstraction, path }) => `bindDynamicModule(TYPES.${abstraction}, () => import("${path}"), locator.bind);`).join("\n")
       );

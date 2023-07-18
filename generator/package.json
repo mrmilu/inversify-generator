@@ -1,4 +1,4 @@
 {
-  "main": "dist/ioc-boilerplate-generator-generator.cjs.js",
-  "module": "dist/ioc-boilerplate-generator-generator.esm.js"
+  "main": "dist/inversify-generator-generator.cjs.js",
+  "module": "dist/inversify-generator-generator.esm.js"
 }
