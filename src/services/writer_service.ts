@@ -49,10 +49,14 @@ export class WriterService {
   }
 
   private typesFile(): Promise<void> {
-    const typesFileString = `export const TYPES = {
-        `.concat(this.dependencies.map(({ abstraction, implementation }) => `${abstraction}: Symbol.for('${implementation}'),`).join("\n")).concat(`
-        };
-        `);
+    const typesFileString = `
+    export const TYPES = {
+      ${this.dependencies
+        .map(({ abstraction }) => {
+          return `${abstraction}: Symbol.for('${abstraction}'),`;
+        })
+        .join("\n")}
+    };`;
     return this.writeFilePromise(`${this.config.output}/types.ts`, typesFileString);
   }
 

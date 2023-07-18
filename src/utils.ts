@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { interfaces } from "inversify";
 import ProviderCreator = interfaces.ProviderCreator;
+export type { ContainerProvider } from "./types/container";
 
 function binder<P, T>(
   bind: <T>(serviceIdentifier: interfaces.ServiceIdentifier<T>) => interfaces.BindingToSyntax<T>,
