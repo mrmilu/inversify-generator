@@ -1,6 +1,6 @@
 {
   "name": "inversify-generator",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "IoC Boilerplate generator for dependency injection",
   "bin": {
     "inversify-generator": "./bin.js"
@@ -21,15 +21,16 @@
     "lint": "eslint --fix --ext js,ts,tsx src",
     "check-types": "tsc --project tsconfig.json",
     "dev": "preconstruct watch",
-    "postinstall": "pnpm prepare"
+    "postinstall": "pnpm prepare",
+    "release": "commit-and-tag-version --dry-run"
   },
   "author": "Mr.Milú",
   "license": "MIT",
   "peerDependencies": {
     "chalk": "~4.1.2",
+    "inversify": "~6.0.1",
     "ts-morph": "~19.0.0",
-    "yargs": "~17.7.2",
-    "inversify": "~6.0.1"
+    "yargs": "~17.7.2"
   },
   "devDependencies": {
     "@babel/core": "~7.22.8",
@@ -43,6 +44,7 @@
     "@typescript-eslint/eslint-plugin": "~6.0.0",
     "@typescript-eslint/parser": "~6.0.0",
     "chalk": "~4.1.2",
+    "commit-and-tag-version": "~11.2.2",
     "eslint": "~8.44.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-unused-imports": "~3.0.0",
