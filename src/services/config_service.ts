@@ -3,7 +3,8 @@ import { readFileSync } from "fs";
 
 const DEFAULT_CONFIG: Config = {
   tsconfig: "./tsconfig.json",
-  output: "./src/ioc"
+  output: "./src/ioc",
+  binding: "default"
 };
 
 export class ConfigService {

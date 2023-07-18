@@ -1,8 +1,9 @@
 import type { Config } from "../types/config";
 import type { Dependency } from "../types/dependency";
-import { Project } from "ts-morph";
+import { Project, Node } from "ts-morph";
 import * as process from "process";
 import { relative, join } from "path";
+import type { DecoratorScopeTypes } from "../types/decorators";
 
 export class DependenciesResolverService {
   dependencies: Array<Dependency> = [];
@@ -17,6 +18,14 @@ export class DependenciesResolverService {
         const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
         if (!hasDecorator) return;
 
+        const scopeDecorator = classDeclaration.getDecorator("scope");
+        const hasScopeDecorator = Boolean(scopeDecorator);
+        const scopeDecoratorArg = scopeDecorator?.getArguments()[0];
+        let dependencyScope: DecoratorScopeTypes = "transient";
+        if (hasScopeDecorator && Node.isStringLiteral(scopeDecoratorArg)) {
+          dependencyScope = scopeDecoratorArg.getText() as DecoratorScopeTypes;
+        }
+
         const className = classDeclaration.getName();
         if (!className) return;
 
@@ -25,7 +34,8 @@ export class DependenciesResolverService {
         this.dependencies.push({
           path: relativePath,
           abstraction: implement?.getText() ?? className,
-          implementation: className
+          implementation: className,
+          scope: dependencyScope
         });
       });
     });

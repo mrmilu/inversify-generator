@@ -5,10 +5,11 @@ import { writeFile, existsSync } from "fs";
 import cliService from "./cli_service";
 import * as process from "process";
 
-const DEFAULT_INDEX_FILE_TEMPLATE = `import "reflect-metadata";
+const DEFAULT_INDEX_FILE_TEMPLATE = (extraImports: string = "") => `
+import "reflect-metadata";
 import { Container } from "inversify";
 import { TYPES } from "./types";
-import { bindDynamicModule } from "./utils";
+${extraImports}
 
 const locator = new Container();
 `;
@@ -28,10 +29,23 @@ export class WriterService {
   }
 
   private indexFile() {
-    const indexFileString = DEFAULT_INDEX_FILE_TEMPLATE.concat(
-      this.dependencies.map(({ abstraction, path }) => `bindDynamicModule(TYPES.${abstraction}, () => import("${path}"));`).join("\n")
-    ).concat(`\n\nexport { locator };`);
-    return this.writeFilePromise(`${this.config.output}/index.ts`, indexFileString);
+    let indexFileString: string = "";
+
+    if (this.config.binding === "dynamic") {
+      indexFileString = DEFAULT_INDEX_FILE_TEMPLATE(`import { bindDynamicModule } from "ioc-boilerplate-generator/utils";`);
+      indexFileString = indexFileString.concat(
+        this.dependencies.map(({ abstraction, path }) => `bindDynamicModule(TYPES.${abstraction}, () => import("${path}"), locator.bind);`).join("\n")
+      );
+    } else {
+      const depImports = this.dependencies.map(({ implementation, path }) => {
+        return `import { ${implementation} } from "${path}";`;
+      });
+      indexFileString = DEFAULT_INDEX_FILE_TEMPLATE(depImports.join("\n")).concat(
+        this.dependencies.map(({ abstraction, implementation }) => `locator.bind(TYPES.${abstraction}).to(${implementation});`).join("\n")
+      );
+    }
+
+    return this.writeFilePromise(`${this.config.output}/index.ts`, indexFileString.concat(`\n\nexport { locator };`));
   }
 
   private typesFile(): Promise<void> {

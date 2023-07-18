@@ -46,6 +46,9 @@ devDependencies:
   husky:
     specifier: ~8.0.3
     version: 8.0.3
+  inversify:
+    specifier: ^6.0.1
+    version: 6.0.1
   lint-staged:
     specifier: ~13.2.3
     version: 13.2.3
@@ -2231,6 +2234,10 @@ packages:
       string-width: 2.1.1
       strip-ansi: 5.2.0
       through: 2.3.8
+    dev: true
+
+  /inversify@6.0.1:
+    resolution: { integrity: sha512-B3ex30927698TJENHR++8FfEaJGqoWOgI6ZY5Ht/nLUsFCwHn6akbwtnUAPCgUepAnTpe2qHxhDNjoKLyz6rgQ== }
     dev: true
 
   /is-arrayish@0.2.1:
