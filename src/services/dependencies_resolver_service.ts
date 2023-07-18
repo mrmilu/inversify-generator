@@ -30,10 +30,15 @@ export class DependenciesResolverService {
         if (!className) return;
 
         const implement = classDeclaration.getImplements()[0];
+        let abstraction: string | undefined = implement?.getText();
+        if (implement?.getChildCount() === 1 && Node.isPropertyAccessExpression(implement.getLastChild())) {
+          abstraction = implement.getLastChild()?.getLastChild()?.getText();
+        }
+
         const relativePath = relative(join(process.cwd(), config.output), sourceFile.getFilePath()).replace(/\.[^.]*$/, "");
         this.dependencies.push({
           path: relativePath,
-          abstraction: implement?.getText() ?? className,
+          abstraction: abstraction ?? className,
           implementation: className,
           scope: dependencyScope
         });
