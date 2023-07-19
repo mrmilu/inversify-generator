@@ -1,1 +1,6 @@
-export type DecoratorScopeTypes = "transient" | "singleton" | "request";
+import type { BindingType, ScopeType } from "./dependency";
+
+export interface GeneratorDecoratorParams {
+  scope?: ScopeType;
+  binding?: BindingType;
+}
