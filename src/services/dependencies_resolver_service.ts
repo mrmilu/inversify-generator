@@ -1,9 +1,9 @@
 import type { Config } from "../types/config";
-import type { Dependency } from "../types/dependency";
+import { Dependency } from "../models/dependency";
+import type { BindingType, ScopeType } from "../types/dependency";
 import { Project, Node } from "ts-morph";
 import * as process from "process";
 import { relative, join } from "path";
-import type { DecoratorScopeTypes } from "../types/decorators";
 
 export class DependenciesResolverService {
   dependencies: Array<Dependency> = [];
@@ -18,12 +18,20 @@ export class DependenciesResolverService {
         const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
         if (!hasDecorator) return;
 
-        const scopeDecorator = classDeclaration.getDecorator("scope");
-        const hasScopeDecorator = Boolean(scopeDecorator);
-        const scopeDecoratorArg = scopeDecorator?.getArguments()[0];
-        let dependencyScope: DecoratorScopeTypes = "transient";
-        if (hasScopeDecorator && Node.isStringLiteral(scopeDecoratorArg)) {
-          dependencyScope = scopeDecoratorArg.getText() as DecoratorScopeTypes;
+        const configDecorator = classDeclaration.getDecorator("generatorConf");
+        const hasConfigDecorator = Boolean(configDecorator);
+        const configDecoratorArg = configDecorator?.getArguments()[0];
+        let dependencyScope: ScopeType | undefined;
+        let dependencyBinding: BindingType | undefined;
+        if (hasConfigDecorator && Node.isObjectLiteralExpression(configDecoratorArg)) {
+          const scopeProperty = configDecoratorArg.getProperty("scope");
+          const bindingProperty = configDecoratorArg.getProperty("binding");
+          if (scopeProperty) {
+            dependencyScope = this.removeQuotes(scopeProperty.getLastChild()?.getText()) as ScopeType | undefined;
+          }
+          if (bindingProperty) {
+            dependencyBinding = this.removeQuotes(bindingProperty.getLastChild()?.getText()) as BindingType | undefined;
+          }
         }
 
         const className = classDeclaration.getName();
@@ -36,13 +44,20 @@ export class DependenciesResolverService {
         }
 
         const relativePath = relative(join(process.cwd(), config.output), sourceFile.getFilePath()).replace(/\.[^.]*$/, "");
-        this.dependencies.push({
-          path: relativePath,
-          abstraction: abstraction ?? className,
-          implementation: className,
-          scope: dependencyScope
-        });
+        this.dependencies.push(
+          new Dependency({
+            path: relativePath,
+            abstraction: abstraction ?? className,
+            implementation: className,
+            scope: dependencyScope,
+            binding: dependencyBinding
+          })
+        );
       });
     });
+  }
+
+  private removeQuotes(str: string | undefined) {
+    return str?.replaceAll('"', "").replaceAll("'", "");
   }
 }
