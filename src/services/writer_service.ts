@@ -1,7 +1,7 @@
 import type { Dependency } from "../models/dependency";
 import type { Config } from "../types/config";
 import { writeFile, existsSync } from "fs";
-import cliService from "./cli_service";
+import { CliService } from "./cli_service";
 import * as process from "process";
 
 const DEFAULT_INDEX_FILE_TEMPLATE = (extraImports: string = "") => `// This is an auto generated file created by inversify-generator
@@ -80,11 +80,11 @@ export class WriterService {
   private outputExists() {
     const dirExists = existsSync(this.config.output);
     if (!dirExists) {
-      cliService.error(`Directory ${this.config.output} not found.\nPlease create the directory or change the output path.`);
+      CliService.error(`Directory ${this.config.output} not found.\nPlease create the directory or change the output path.`);
       process.exit(1);
     } else {
-      cliService.success(`Directory ${this.config.output} found`);
-      cliService.success("Generating files...");
+      CliService.success(`Directory ${this.config.output} found`);
+      CliService.success("Generating files...");
     }
   }
 

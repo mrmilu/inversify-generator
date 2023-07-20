@@ -7,10 +7,11 @@ import chalk from "chalk";
 const TSCONFIG_ARG = { t: "t", tsconfig: "tsconfig" };
 const OUTPUT_ARG = { o: "o", output: "output" };
 const BINDING_ARG = { b: "b", binding: "binding" };
+const WATCH_ARG = { w: "w", watch: "watch" };
 
-class CliService {
-  async args(): Promise<Partial<Config>> {
-    const { tsconfig, output, binding } = await yargs(hideBin(process.argv))
+export class CliService {
+  static async args(): Promise<Partial<Config>> {
+    const { tsconfig, output, binding, watch } = await yargs(hideBin(process.argv))
       .wrap(yargs.terminalWidth() - 5)
       .usage("Usage: $0 [flags]")
       .example("$0 --tsconfig ./tsconfig.json", "Generate types and bindings with given tsconfig")
@@ -27,24 +28,27 @@ class CliService {
           alias: BINDING_ARG.b,
           describe: "Binding type for creating bindings to locator",
           choices: ["default", "dynamic"]
+        },
+        [WATCH_ARG.watch]: {
+          alias: WATCH_ARG.w,
+          describe: "Watch file changes to execute generator",
+          boolean: true
         }
       })
       .help("h")
       .alias("h", "help").argv;
-    return { tsconfig, output, binding } as Config;
+    return { tsconfig, output, binding, watch } as Config;
   }
 
-  error(message: string) {
+  static error(message: string) {
     console.log(chalk.red(message));
   }
 
-  success(message: string) {
+  static success(message: string) {
     console.log(chalk.green(message));
   }
 
-  warning(message: string) {
+  static warning(message: string) {
     console.log(chalk.hex("#FFA500")(message));
   }
 }
-
-export default new CliService();

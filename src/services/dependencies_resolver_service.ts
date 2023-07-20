@@ -1,6 +1,7 @@
 import type { Config } from "../types/config";
 import { Dependency } from "../models/dependency";
 import type { BindingType, ScopeType } from "../types/dependency";
+import type { ClassDeclaration } from "ts-morph";
 import { Project, Node } from "ts-morph";
 import * as process from "process";
 import { relative, join } from "path";
@@ -12,27 +13,20 @@ export class DependenciesResolverService {
     this.getDependencies(config);
   }
 
+  static hasInversifyDecorator(filePath: string) {
+    const project = new Project();
+    project.addSourceFileAtPath(filePath);
+    const sourceFile = project.getSourceFile(filePath);
+    return sourceFile?.getClasses().some((classDeclaration) => Boolean(classDeclaration.getDecorator("injectable")));
+  }
+
   private getDependencies(config: Config) {
     new Project({ tsConfigFilePath: config.tsconfig }).getSourceFiles().forEach((sourceFile) => {
       sourceFile.getClasses().forEach((classDeclaration) => {
         const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
         if (!hasDecorator) return;
 
-        const configDecorator = classDeclaration.getDecorator("generatorConf");
-        const hasConfigDecorator = Boolean(configDecorator);
-        const configDecoratorArg = configDecorator?.getArguments()[0];
-        let dependencyScope: ScopeType | undefined;
-        let dependencyBinding: BindingType | undefined;
-        if (hasConfigDecorator && Node.isObjectLiteralExpression(configDecoratorArg)) {
-          const scopeProperty = configDecoratorArg.getProperty("scope");
-          const bindingProperty = configDecoratorArg.getProperty("binding");
-          if (scopeProperty) {
-            dependencyScope = this.removeQuotes(scopeProperty.getLastChild()?.getText()) as ScopeType | undefined;
-          }
-          if (bindingProperty) {
-            dependencyBinding = this.removeQuotes(bindingProperty.getLastChild()?.getText()) as BindingType | undefined;
-          }
-        }
+        const { dependencyScope, dependencyBinding } = this.getDecoratorConfig(classDeclaration);
 
         const className = classDeclaration.getName();
         if (!className) return;
@@ -55,6 +49,37 @@ export class DependenciesResolverService {
         );
       });
     });
+  }
+
+  private getDecoratorConfig(classDeclaration: ClassDeclaration) {
+    const configDecorator = classDeclaration.getDecorator("generatorConf");
+    const hasConfigDecorator = Boolean(configDecorator);
+    const configDecoratorArg = configDecorator?.getArguments()[0];
+    let dependencyScope: ScopeType | undefined;
+    let dependencyBinding: BindingType | undefined;
+    if (hasConfigDecorator && Node.isObjectLiteralExpression(configDecoratorArg)) {
+      const scopeProperty = configDecoratorArg.getProperty("scope");
+      const bindingProperty = configDecoratorArg.getProperty("binding");
+      if (scopeProperty) {
+        dependencyScope = this.removeQuotes(scopeProperty.getLastChild()?.getText()) as ScopeType | undefined;
+      }
+      if (bindingProperty) {
+        dependencyBinding = this.removeQuotes(bindingProperty.getLastChild()?.getText()) as BindingType | undefined;
+      }
+    }
+    const className = classDeclaration.getName();
+    if (dependencyScope?.length === 0) {
+      throw new Error(`Dependency scope can't be an empty string for ${className}`);
+    } else if (dependencyScope && dependencyScope !== "transient" && dependencyScope !== "singleton") {
+      throw new Error(`Wrong config scope for ${className}. Use one of the followings: 'transient' | 'singleton'`);
+    }
+    if (dependencyBinding?.length === 0) {
+      throw new Error(`Dependency binding can't be an empty string for ${className}`);
+    } else if (dependencyBinding && dependencyBinding !== "default" && dependencyBinding !== "dynamic") {
+      throw new Error(`Wrong config binding type for ${className}. Use one of the followings: 'default' | 'dynamic'`);
+    }
+
+    return { dependencyScope, dependencyBinding };
   }
 
   private removeQuotes(str: string | undefined) {

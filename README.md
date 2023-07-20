@@ -27,6 +27,7 @@ config file.
 | `tsconfig` | Path to the tsconfig file                                                | `./tsconfig.json` |
 | `out`      | Path to the output directory                                             | `./src/ioc`       |
 | `binding`  | Type of binding applied to the<br/>implementations in the generated file | `default`         |
+| `watch`    | Watch files for binding and types generation                             | `false`           |
 
 Type `inversify-generator -h` to see a list of available flags and how to use them.
 
@@ -111,7 +112,6 @@ pnpm run dev # Runs program
 
 ## Roadmap
 
-- [ ] Add `--watch` flag with `chokidar`
 - [ ] Add support for modules
 - [ ] Add tests
 - [ ] Add possibility to have several exported modules in a file to use
