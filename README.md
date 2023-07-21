@@ -4,7 +4,7 @@
 But due to the nature of TypeScript and the inability to infer types at runtime Inversify and every other
 IoC for TypeScript relies on identifiers to assign an implementation to an abstraction.
 
-This packages tries to make the process of assigning an identifier to an implementation a little bit
+This packages tries to make the process of assigning an identifier to an implementation a little
 less cumbersome by generating type identifiers and bindings for inversify automatically.
 
 ## Install
@@ -72,7 +72,7 @@ adding the possibility of creating [providers (asynchronous factories)](https://
 
 If you are using inversify in a front end app, this method will probably make
 your main bundle smaller (as long as the sections that load the async factories are not executed)
-because it will only download the corresponding dependency chunk needed.
+because it will only download the corresponding dependency chunks when needed.
 
 This would be an example of the generated file by the `dynamic` binding type:
 
@@ -95,23 +95,34 @@ export { myContainer };
 > in the file and decorated with `@injectable` only the first one will be bound. So if you
 > are using the `dynamic` type try having one class implementation per file.
 
-## Usage
+### Decorator util
 
-```bash
-nvm use # Sets the correct node version
-corepack enable # Enables pnpm
-pnpm install # Installs dependencies
-mkdir out # Creates output directory
-pnpm run dev # Runs program
+This package also has a decorator util that will let you handle per dependency both scope and binding type.
+By default, Inversify when binding a dependency it does it with the **transient** scope. With this util you will able
+to configure the scope per dependency to be either **transient** or **singleton**.
+
+Also, this decorator adds the ability to configure the [binding type](#binding-type) per dependency so that if you have one
+default binding configured ([through flag or config file](#options)) you can select another one to a specific class.
+
+```typescript
+import { generatorConf } from "inversify-generator/decorators";
+
+@injectable()
+@generatorConf({ scope: "singleton", biding: "default" })
+export class FooRepository implements IFooRepository {
+  @inject(TYPES.Service) private serviceProvider!: IocProvider<IService>;
+
+  async baz(): Promise<Page<Post>> {
+    const service = await this.serviceProvider();
+    const baz = await service.get<Array<Record<string, unknown>>>("/baz");
+    return baz.data;
+  }
+}
 ```
-
-## Dependencies
-
-- `ts-morph`: Typescript AST analyser
-- `yargs`: Command line arguments parser
 
 ## Roadmap
 
+- [ ] Add `request` scope for configuration decorator.
 - [ ] Add support for modules
 - [ ] Add tests
 - [ ] Add possibility to have several exported modules in a file to use
