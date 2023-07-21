@@ -1,6 +1,6 @@
 {
   "name": "inversify-generator",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "IoC Boilerplate generator for dependency injection",
   "bin": {
     "inversify-generator": "./bin.js"
