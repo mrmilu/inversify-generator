@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.3](https://github.com/mrmilu/inversify-generator/compare/v0.1.2...v0.1.3) (2023-08-07)
+
+### Bug Fixes
+
+- fixed wrong files regex for declarations ([a038e21](https://github.com/mrmilu/inversify-generator/commit/a038e21a07e284aa2d1d81e40eaeff0a806de2cb))
+
 ## [0.1.2](https://github.com/mrmilu/inversify-generator/compare/v0.1.1...v0.1.2) (2023-08-07)
 
 ### Bug Fixes
