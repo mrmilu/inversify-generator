@@ -10,7 +10,7 @@
     "generator",
     "decorators",
     "utils",
-    "!**/*.d.ts",
+    "**/*.d.ts",
     "dist"
   ],
   "scripts": {
