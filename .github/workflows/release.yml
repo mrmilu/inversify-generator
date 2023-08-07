@@ -6,7 +6,7 @@ on:
     branches: [main]
 
 jobs:
-  release-and-docs:
+  release:
     runs-on: ubuntu-latest
 
     steps:
@@ -33,7 +33,7 @@ jobs:
       - name: Release
         run: |
           pnpm release
-          git push --follow-tags origin master
+          git push --follow-tags origin main
           pnpm build
 
       - name: Publish
