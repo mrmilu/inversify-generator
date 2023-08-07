@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.1](https://github.com/mrmilu/inversify-generator/compare/v0.1.0...v0.1.1) (2023-08-07)
+
+### Bug Fixes
+
+- removed postinstall script might be blocking package build upon installation ([8532988](https://github.com/mrmilu/inversify-generator/commit/8532988c7d93f4a83890d49813bfb5f9b04f77fa))
+
 ## 0.1.0 (2023-08-07)
 
 ### ⚠ BREAKING CHANGES
