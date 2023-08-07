@@ -1,0 +1,4 @@
+{
+  "main": "dist/inversify-generator-generator.cjs.js",
+  "module": "dist/inversify-generator-generator.esm.js"
+}

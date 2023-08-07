@@ -1,5 +1,2 @@
-export interface Dependency {
-  abstraction: string;
-  implementation: string;
-  path: string;
-}
+export type BindingType = "default" | "dynamic";
+export type ScopeType = "transient" | "singleton";
