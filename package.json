@@ -21,7 +21,6 @@
     "lint": "eslint --fix --ext js,ts,tsx src",
     "check-types": "tsc --project tsconfig.json",
     "dev": "preconstruct watch",
-    "postinstall": "pnpm prepare",
     "release": "commit-and-tag-version"
   },
   "author": "Mr.Milú",
