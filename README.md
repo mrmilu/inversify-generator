@@ -25,7 +25,7 @@ config file.
 | Option     | Description                                                              | Default           |
 | ---------- | ------------------------------------------------------------------------ | ----------------- |
 | `tsconfig` | Path to the tsconfig file                                                | `./tsconfig.json` |
-| `out`      | Path to the output directory                                             | `./src/ioc`       |
+| `output`   | Path to the output directory                                             | `./src/ioc`       |
 | `binding`  | Type of binding applied to the<br/>implementations in the generated file | `default`         |
 | `watch`    | Watch files for binding and types generation                             | `false`           |
 
@@ -36,7 +36,7 @@ Type `inversify-generator -h` to see a list of available flags and how to use th
 ```json
 {
   "tsconfig": "./tsconfig.json",
-  "out": "./src/ioc",
+  "output": "./src/ioc",
   "binding": "default"
 }
 ```
