@@ -49,7 +49,7 @@ jobs:
         id: slack
         uses: slackapi/slack-github-action@v1.19.0
         with:
-          channel-id: "C0BJB6V4P"
+          channel-id: "C03BJMKFZHV"
           payload: |
             {
               "blocks": [
