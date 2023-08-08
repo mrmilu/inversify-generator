@@ -8,6 +8,7 @@ export class Dependency {
   path: string;
   scope?: ScopeType;
   binding?: BindingType;
+  customTypeName?: string;
 
   constructor(params: DependencyConstructor) {
     this.abstraction = params.abstraction;
@@ -15,6 +16,7 @@ export class Dependency {
     this.path = params.path;
     this.scope = params.scope;
     this.binding = params.binding;
+    this.customTypeName = params.customTypeName;
   }
 
   get itsDefaultBinding(): boolean {

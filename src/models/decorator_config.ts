@@ -5,6 +5,7 @@ import { Node } from "ts-morph";
 export class DecoratorConfig {
   dependencyScope?: ScopeType;
   dependencyBinding?: BindingType;
+  typeName?: string;
   private readonly className?: string;
 
   constructor(classDeclaration: ClassDeclaration) {
@@ -20,11 +21,15 @@ export class DecoratorConfig {
     if (hasConfigDecorator && Node.isObjectLiteralExpression(configDecoratorArg)) {
       const scopeProperty = configDecoratorArg.getProperty("scope");
       const bindingProperty = configDecoratorArg.getProperty("binding");
+      const typeNameProperty = configDecoratorArg.getProperty("typeName");
       if (scopeProperty) {
         this.dependencyScope = this.removeQuotes(scopeProperty.getLastChild()?.getText()) as ScopeType | undefined;
       }
       if (bindingProperty) {
         this.dependencyBinding = this.removeQuotes(bindingProperty.getLastChild()?.getText()) as BindingType | undefined;
+      }
+      if (typeNameProperty) {
+        this.typeName = this.removeQuotes(typeNameProperty?.getLastChild()?.getText());
       }
     }
   }

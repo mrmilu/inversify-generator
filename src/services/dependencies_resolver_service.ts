@@ -25,7 +25,7 @@ export class DependenciesResolverService {
         const hasDecorator = Boolean(classDeclaration.getDecorator("injectable"));
         if (!hasDecorator) return;
 
-        const { dependencyScope, dependencyBinding } = new DecoratorConfig(classDeclaration);
+        const { dependencyScope, dependencyBinding, typeName } = new DecoratorConfig(classDeclaration);
 
         const className = classDeclaration.getName();
         if (!className) return;
@@ -43,7 +43,8 @@ export class DependenciesResolverService {
             abstraction: abstraction ?? className,
             implementation: className,
             scope: dependencyScope,
-            binding: dependencyBinding
+            binding: dependencyBinding,
+            customTypeName: typeName
           })
         );
       });

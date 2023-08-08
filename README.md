@@ -97,18 +97,22 @@ export { myContainer };
 
 ### Decorator util
 
-This package also has a decorator util that will let you handle per dependency both scope and binding type.
-By default, Inversify when binding a dependency it does it with the **transient** scope. With this util you will able
+This package also has a decorator util that will let you handle per dependency both scope, binding type and type identifier custom name.
+
+By default, Inversify when binding a dependency it does it with the **transient** scope. With this util you will be able
 to configure the scope per dependency to be either **transient** or **singleton**.
 
 Also, this decorator adds the ability to configure the [binding type](#binding-type) per dependency so that if you have one
 default binding configured ([through flag or config file](#options)) you can select another one to a specific class.
 
+Regarding the type identifier name, this util lets you change it from the one from default (that it's corresponding implementation,
+or it's class name if it does not implement anything).
+
 ```typescript
 import { generatorConf } from "inversify-generator/decorators";
 
 @injectable()
-@generatorConf({ scope: "singleton", biding: "default" })
+@generatorConf({ scope: "singleton", biding: "default", typeName: "CoolRepo" })
 export class FooRepository implements IFooRepository {
   @inject(TYPES.Service) private serviceProvider!: IocProvider<IService>;
 
@@ -122,6 +126,7 @@ export class FooRepository implements IFooRepository {
 
 ## Roadmap
 
+- [ ] Add typedoc
 - [ ] Add `request` scope for configuration decorator.
 - [ ] Add support for modules
 - [ ] Add tests
