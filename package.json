@@ -1,7 +1,8 @@
 {
   "name": "inversify-generator",
   "version": "0.1.4",
-  "description": "IoC Boilerplate generator for dependency injection",
+  "description": "Inversifyjs type identifiers and bindings generator",
+  "repository": "https://github.com/mrmilu/inversify-generator",
   "exports": {
     "./utils": {
       "types": {
