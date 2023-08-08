@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.4](https://github.com/mrmilu/inversify-generator/compare/v0.1.3...v0.1.4) (2023-08-08)
+
+### Features
+
+- added typeName to decorator, fixed several issues and refactored writer service ([1de0ad0](https://github.com/mrmilu/inversify-generator/commit/1de0ad01306b815322c8bf63dd540d9ba70269d1))
+
+### Bug Fixes
+
+- added exports in package.json through preconstruct ([b762875](https://github.com/mrmilu/inversify-generator/commit/b762875ec5c262bf6c3934973267f8bf994cea12))
+
 ## [0.1.3](https://github.com/mrmilu/inversify-generator/compare/v0.1.2...v0.1.3) (2023-08-07)
 
 ### Bug Fixes
