@@ -2,6 +2,36 @@
   "name": "inversify-generator",
   "version": "0.1.3",
   "description": "IoC Boilerplate generator for dependency injection",
+  "exports": {
+    "./utils": {
+      "types": {
+        "import": "./utils/dist/inversify-generator-utils.cjs.mjs",
+        "default": "./utils/dist/inversify-generator-utils.cjs.js"
+      },
+      "module": "./utils/dist/inversify-generator-utils.esm.js",
+      "import": "./utils/dist/inversify-generator-utils.cjs.mjs",
+      "default": "./utils/dist/inversify-generator-utils.cjs.js"
+    },
+    "./generator": {
+      "types": {
+        "import": "./generator/dist/inversify-generator-generator.cjs.mjs",
+        "default": "./generator/dist/inversify-generator-generator.cjs.js"
+      },
+      "module": "./generator/dist/inversify-generator-generator.esm.js",
+      "import": "./generator/dist/inversify-generator-generator.cjs.mjs",
+      "default": "./generator/dist/inversify-generator-generator.cjs.js"
+    },
+    "./decorators": {
+      "types": {
+        "import": "./decorators/dist/inversify-generator-decorators.cjs.mjs",
+        "default": "./decorators/dist/inversify-generator-decorators.cjs.js"
+      },
+      "module": "./decorators/dist/inversify-generator-decorators.esm.js",
+      "import": "./decorators/dist/inversify-generator-decorators.cjs.mjs",
+      "default": "./decorators/dist/inversify-generator-decorators.cjs.js"
+    },
+    "./package.json": "./package.json"
+  },
   "bin": {
     "inversify-generator": "./bin.js"
   },
@@ -63,6 +93,12 @@
     "yargs": "~17.7.2"
   },
   "preconstruct": {
+    "exports": {
+      "importConditionDefaultExport": "default"
+    },
+    "___experimentalFlags_WILL_CHANGE_IN_PATCH": {
+      "importsConditions": true
+    },
     "entrypoints": [
       "./generator.ts",
       "./utils.ts",
