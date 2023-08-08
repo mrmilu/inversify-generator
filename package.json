@@ -105,5 +105,13 @@
       "./utils.ts",
       "./decorators.ts"
     ]
-  }
+  },
+  "keywords": [
+    "inversify",
+    "inversifyjs",
+    "inversify-generator",
+    "type identifiers",
+    "binding",
+    "generator"
+  ]
 }
