@@ -1,6 +1,6 @@
 import type { Dependency } from "../models/dependency";
 import type { Config } from "../types/config";
-import { existsSync } from "fs";
+import { existsSync, mkdirSync } from "fs";
 import { CliService } from "./cli_service";
 import * as process from "process";
 import { IndexWriter } from "../models/index_writer";
@@ -25,11 +25,15 @@ export class WriterService {
   private outputExists() {
     const dirExists = existsSync(this.config.output);
     if (!dirExists) {
-      CliService.error(`Directory ${this.config.output} not found.\nPlease create the directory or change the output path.`);
-      process.exit(1);
-    } else {
-      CliService.success(`Directory ${this.config.output} found`);
-      CliService.success("Generating files...");
+      CliService.warning(`Directory ${this.config.output} not found.\nCreating it...`);
+      mkdirSync(this.config.output);
+      const existsNow = existsSync(this.config.output);
+      if (!existsNow) {
+        CliService.error(`Directory ${this.config.output} could not be created.`);
+        process.exit(1);
+      }
     }
+    CliService.success(`Directory ${this.config.output} found`);
+    CliService.success("Generating files...");
   }
 }

@@ -49,6 +49,6 @@ export class CliService {
   }
 
   static warning(message: string) {
-    console.log(chalk.hex("#FFA500")(message));
+    console.log(chalk.hex("#a23d00")(message));
   }
 }
