@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.5](https://github.com/mrmilu/inversify-generator/compare/v0.1.4...v0.1.5) (2023-09-18)
+
+### Features
+
+- create output path if does not exist ([411eb00](https://github.com/mrmilu/inversify-generator/commit/411eb00922da39f717dc2a016ea2dfe25320c6ab))
+
+### Bug Fixes
+
+- ignore regex to avoid ignoring root paths with dot in name ([100ee00](https://github.com/mrmilu/inversify-generator/commit/100ee00f33bbcb05428e599337fac4cfe172d387))
+
 ## [0.1.4](https://github.com/mrmilu/inversify-generator/compare/v0.1.3...v0.1.4) (2023-08-08)
 
 ### Features

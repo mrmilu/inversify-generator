@@ -1,6 +1,6 @@
 {
   "name": "inversify-generator",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Inversifyjs type identifiers and bindings generator",
   "repository": "https://github.com/mrmilu/inversify-generator",
   "exports": {
