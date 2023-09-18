@@ -1,6 +1,5 @@
 import chokidar from "chokidar";
 import process from "process";
-import * as fs from "fs";
 export class WatcherService {
   watcher: chokidar.FSWatcher;
   constructor() {
@@ -9,9 +8,5 @@ export class WatcherService {
 
   private init() {
     return chokidar.watch(process.cwd(), { ignored: [/\.*\/node_modules\/.*/, /^.*\.(?!js$|ts$)[^.]*$/] });
-  }
-
-  isTsJsFile(path: string) {
-    return fs.lstatSync(path).isFile() && path.match(/\.(ts|js)/);
   }
 }
