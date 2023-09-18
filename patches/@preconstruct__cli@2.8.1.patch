@@ -1,0 +1,3801 @@
+diff --git a/cli/dist/preconstruct-cli-cli.cjs.js b/cli/dist/preconstruct-cli-cli.cjs.js
+index b18c560863966454aab77816b147401f4ee875e1..708329a24343f64cc54bae59b464c1da0910ca2f 100644
+--- a/cli/dist/preconstruct-cli-cli.cjs.js
++++ b/cli/dist/preconstruct-cli-cli.cjs.js
+@@ -1,55 +1,66 @@
+-'use strict';
+-
+-var meow = require('meow');
+-var _defineProperty = require('@babel/runtime/helpers/defineProperty');
+-var path = require('path');
+-var enquirer = require('enquirer');
+-var pLimit = require('p-limit');
+-var DataLoader = require('dataloader');
+-var chalk = require('chalk');
+-var fastGlob = require('fast-glob');
+-var fs = require('fs-extra');
+-var _objectSpread = require('@babel/runtime/helpers/objectSpread2');
+-var detectIndent = require('detect-indent');
+-var parseJson = require('parse-json');
+-var util = require('util');
+-var normalizePath = require('normalize-path');
+-var parseGlob = require('parse-glob');
+-var zod = require('zod');
+-var packlist = require('npm-packlist');
+-var equal = require('fast-deep-equal');
+-var resolveFrom = require('resolve-from');
+-var rollup = require('rollup');
+-var resolve = require('@rollup/plugin-node-resolve');
+-var alias = require('@rollup/plugin-alias');
+-var cjs = require('@rollup/plugin-commonjs');
+-var replace = require('@rollup/plugin-replace');
+-var builtInModules = require('builtin-modules');
+-var os = require('os');
+-var MagicString = require('magic-string');
+-var json = require('@rollup/plugin-json');
+-var Worker = require('jest-worker');
+-var isCI = require('is-ci');
+-var QuickLRU = require('quick-lru');
+-var semver = require('semver');
+-var codeFrame = require('@babel/code-frame');
+-var estreeWalker = require('estree-walker');
+-var isReference = require('is-reference');
+-var ms = require('ms');
+-
+-function _interopDefault (e) { return e && e.__esModule ? e : { 'default': e }; }
++"use strict";
++
++var meow = require("meow");
++var _defineProperty = require("@babel/runtime/helpers/defineProperty");
++var path = require("path");
++var enquirer = require("enquirer");
++var pLimit = require("p-limit");
++var DataLoader = require("dataloader");
++var chalk = require("chalk");
++var fastGlob = require("fast-glob");
++var fs = require("fs-extra");
++var _objectSpread = require("@babel/runtime/helpers/objectSpread2");
++var detectIndent = require("detect-indent");
++var parseJson = require("parse-json");
++var util = require("util");
++var normalizePath = require("normalize-path");
++var parseGlob = require("parse-glob");
++var zod = require("zod");
++var packlist = require("npm-packlist");
++var equal = require("fast-deep-equal");
++var resolveFrom = require("resolve-from");
++var rollup = require("rollup");
++var resolve = require("@rollup/plugin-node-resolve");
++var alias = require("@rollup/plugin-alias");
++var cjs = require("@rollup/plugin-commonjs");
++var replace = require("@rollup/plugin-replace");
++var builtInModules = require("builtin-modules");
++var os = require("os");
++var MagicString = require("magic-string");
++var json = require("@rollup/plugin-json");
++var Worker = require("jest-worker");
++var isCI = require("is-ci");
++var QuickLRU = require("quick-lru");
++var semver = require("semver");
++var codeFrame = require("@babel/code-frame");
++var estreeWalker = require("estree-walker");
++var isReference = require("is-reference");
++var ms = require("ms");
++const exec = util.promisify(require("child_process").exec);
++
++function _interopDefault(e) {
++  return e && e.__esModule ? e : { default: e };
++}
+ 
+ function _interopNamespace(e) {
+   if (e && e.__esModule) return e;
+   var n = Object.create(null);
+   if (e) {
+     Object.keys(e).forEach(function (k) {
+-      if (k !== 'default') {
++      if (k !== "default") {
+         var d = Object.getOwnPropertyDescriptor(e, k);
+-        Object.defineProperty(n, k, d.get ? d : {
+-          enumerable: true,
+-          get: function () { return e[k]; }
+-        });
++        Object.defineProperty(
++          n,
++          k,
++          d.get
++            ? d
++            : {
++                enumerable: true,
++                get: function () {
++                  return e[k];
++                }
++              }
++        );
+       }
+     });
+   }
+@@ -57,90 +68,93 @@ function _interopNamespace(e) {
+   return Object.freeze(n);
+ }
+ 
+-var meow__default = /*#__PURE__*/_interopDefault(meow);
+-var path__namespace = /*#__PURE__*/_interopNamespace(path);
+-var enquirer__default = /*#__PURE__*/_interopDefault(enquirer);
+-var pLimit__default = /*#__PURE__*/_interopDefault(pLimit);
+-var DataLoader__default = /*#__PURE__*/_interopDefault(DataLoader);
+-var chalk__default = /*#__PURE__*/_interopDefault(chalk);
+-var fastGlob__default = /*#__PURE__*/_interopDefault(fastGlob);
+-var fs__namespace = /*#__PURE__*/_interopNamespace(fs);
+-var detectIndent__default = /*#__PURE__*/_interopDefault(detectIndent);
+-var parseJson__default = /*#__PURE__*/_interopDefault(parseJson);
+-var util__default = /*#__PURE__*/_interopDefault(util);
+-var normalizePath__default = /*#__PURE__*/_interopDefault(normalizePath);
+-var parseGlob__default = /*#__PURE__*/_interopDefault(parseGlob);
+-var packlist__default = /*#__PURE__*/_interopDefault(packlist);
+-var equal__default = /*#__PURE__*/_interopDefault(equal);
+-var resolveFrom__default = /*#__PURE__*/_interopDefault(resolveFrom);
+-var resolve__default = /*#__PURE__*/_interopDefault(resolve);
+-var alias__default = /*#__PURE__*/_interopDefault(alias);
+-var cjs__default = /*#__PURE__*/_interopDefault(cjs);
+-var replace__default = /*#__PURE__*/_interopDefault(replace);
+-var builtInModules__default = /*#__PURE__*/_interopDefault(builtInModules);
+-var MagicString__default = /*#__PURE__*/_interopDefault(MagicString);
+-var json__default = /*#__PURE__*/_interopDefault(json);
+-var Worker__default = /*#__PURE__*/_interopDefault(Worker);
+-var isCI__default = /*#__PURE__*/_interopDefault(isCI);
+-var QuickLRU__default = /*#__PURE__*/_interopDefault(QuickLRU);
+-var semver__default = /*#__PURE__*/_interopDefault(semver);
+-var isReference__default = /*#__PURE__*/_interopDefault(isReference);
+-var ms__default = /*#__PURE__*/_interopDefault(ms);
++var meow__default = /*#__PURE__*/ _interopDefault(meow);
++var path__namespace = /*#__PURE__*/ _interopNamespace(path);
++var enquirer__default = /*#__PURE__*/ _interopDefault(enquirer);
++var pLimit__default = /*#__PURE__*/ _interopDefault(pLimit);
++var DataLoader__default = /*#__PURE__*/ _interopDefault(DataLoader);
++var chalk__default = /*#__PURE__*/ _interopDefault(chalk);
++var fastGlob__default = /*#__PURE__*/ _interopDefault(fastGlob);
++var fs__namespace = /*#__PURE__*/ _interopNamespace(fs);
++var detectIndent__default = /*#__PURE__*/ _interopDefault(detectIndent);
++var parseJson__default = /*#__PURE__*/ _interopDefault(parseJson);
++var util__default = /*#__PURE__*/ _interopDefault(util);
++var normalizePath__default = /*#__PURE__*/ _interopDefault(normalizePath);
++var parseGlob__default = /*#__PURE__*/ _interopDefault(parseGlob);
++var packlist__default = /*#__PURE__*/ _interopDefault(packlist);
++var equal__default = /*#__PURE__*/ _interopDefault(equal);
++var resolveFrom__default = /*#__PURE__*/ _interopDefault(resolveFrom);
++var resolve__default = /*#__PURE__*/ _interopDefault(resolve);
++var alias__default = /*#__PURE__*/ _interopDefault(alias);
++var cjs__default = /*#__PURE__*/ _interopDefault(cjs);
++var replace__default = /*#__PURE__*/ _interopDefault(replace);
++var builtInModules__default = /*#__PURE__*/ _interopDefault(builtInModules);
++var MagicString__default = /*#__PURE__*/ _interopDefault(MagicString);
++var json__default = /*#__PURE__*/ _interopDefault(json);
++var Worker__default = /*#__PURE__*/ _interopDefault(Worker);
++var isCI__default = /*#__PURE__*/ _interopDefault(isCI);
++var QuickLRU__default = /*#__PURE__*/ _interopDefault(QuickLRU);
++var semver__default = /*#__PURE__*/ _interopDefault(semver);
++var isReference__default = /*#__PURE__*/ _interopDefault(isReference);
++var ms__default = /*#__PURE__*/ _interopDefault(ms);
+ 
+ let limit = pLimit__default["default"](1); // there might be a simpler solution to this than using dataloader but it works so ¯\_(ツ)_/¯
+ 
+ let prefix = `🎁 ${chalk__default["default"].green("?")}`;
+ function createPromptConfirmLoader(message) {
+-  let loader = new DataLoader__default["default"](pkgs => limit(() => (async () => {
+-    if (pkgs.length === 1) {
+-      // @ts-ignore
+-      let {
+-        confirm
+-      } = await enquirer__default["default"].prompt([{
+-        // @ts-ignore
+-        type: "confirm",
+-        name: "confirm",
+-        message,
+-        // @ts-ignore
+-        prefix: prefix + " " + pkgs[0].name,
+-        initial: true
+-      }]);
+-      return [confirm];
+-    } // @ts-ignore
+-
+-
+-    let {
+-      answers
+-    } = await enquirer__default["default"].prompt([{
+-      type: "multiselect",
+-      name: "answers",
+-      message,
+-      choices: pkgs.map(pkg => ({
+-        name: pkg.name,
+-        initial: true
+-      })),
+-      // @ts-ignore
+-      prefix
+-    }]);
+-    return pkgs.map(pkg => {
+-      return answers.includes(pkg.name);
+-    });
+-  })()));
+-  return pkg => loader.load(pkg);
++  let loader = new DataLoader__default["default"]((pkgs) =>
++    limit(() =>
++      (async () => {
++        if (pkgs.length === 1) {
++          // @ts-ignore
++          let { confirm } = await enquirer__default["default"].prompt([
++            {
++              // @ts-ignore
++              type: "confirm",
++              name: "confirm",
++              message,
++              // @ts-ignore
++              prefix: prefix + " " + pkgs[0].name,
++              initial: true
++            }
++          ]);
++          return [confirm];
++        } // @ts-ignore
++
++        let { answers } = await enquirer__default["default"].prompt([
++          {
++            type: "multiselect",
++            name: "answers",
++            message,
++            choices: pkgs.map((pkg) => ({
++              name: pkg.name,
++              initial: true
++            })),
++            // @ts-ignore
++            prefix
++          }
++        ]);
++        return pkgs.map((pkg) => {
++          return answers.includes(pkg.name);
++        });
++      })()
++    )
++  );
++  return (pkg) => loader.load(pkg);
+ }
+ let doPromptInput = async (message, pkg, defaultAnswer) => {
+   // @ts-ignore
+-  let {
+-    input
+-  } = await enquirer__default["default"].prompt([{
+-    // @ts-ignore
+-    type: "input",
+-    name: "input",
+-    message,
+-    // @ts-ignore
+-    prefix: prefix + " " + pkg.name,
+-    initial: defaultAnswer
+-  }]);
++  let { input } = await enquirer__default["default"].prompt([
++    {
++      // @ts-ignore
++      type: "input",
++      name: "input",
++      message,
++      // @ts-ignore
++      prefix: prefix + " " + pkg.name,
++      initial: defaultAnswer
++    }
++  ]);
+   return input;
+ };
+ let promptInput = (message, pkg, defaultAnswer) => limit(() => doPromptInput(message, pkg, defaultAnswer));
+@@ -200,7 +214,6 @@ class Item {
+ 
+     return false;
+   }
+-
+ }
+ 
+ function format(message, messageType, scope) {
+@@ -211,13 +224,16 @@ function format(message, messageType, scope) {
+     none: ""
+   }[messageType];
+   let fullPrefix = "🎁" + prefix + (scope ? " " + chalk__default["default"].cyan(scope) : "");
+-  return String(message).split("\n").map(line => {
+-    if (!line.trim()) {
+-      return fullPrefix;
+-    }
++  return String(message)
++    .split("\n")
++    .map((line) => {
++      if (!line.trim()) {
++        return fullPrefix;
++      }
+ 
+-    return `${fullPrefix} ${line}`;
+-  }).join("\n");
++      return `${fullPrefix} ${line}`;
++    })
++    .join("\n");
+ }
+ function error(message, scope) {
+   console.error(format(message, "error", scope));
+@@ -240,26 +256,27 @@ class FatalError extends Error {
+ 
+     this.scope = scope;
+   }
+-
+ }
+ class BatchError extends Error {
+   constructor(errors) {
+-    super(errors.map(x => {
+-      return format(x.message, "none", x.scope);
+-    }).join("\n"));
++    super(
++      errors
++        .map((x) => {
++          return format(x.message, "none", x.scope);
++        })
++        .join("\n")
++    );
+ 
+     _defineProperty(this, "errors", void 0);
+ 
+     this.errors = errors;
+   }
+-
+ }
+ class ScopelessError extends Error {}
+ class UnexpectedBuildError extends FatalError {
+   constructor(error, pkgName) {
+     super(`${util__default["default"].format("", error).trim()}`, pkgName);
+   }
+-
+ }
+ class FixableError extends FatalError {}
+ 
+@@ -275,7 +292,10 @@ class Entrypoint extends Item {
+ 
+     this.package = pkg;
+     this.source = source;
+-    this.afterPackageName = pkg.directory === this.directory ? "" : "/" + normalizePath__default["default"](path__namespace["default"].dirname(path__namespace["default"].relative(pkg.directory, filePath)));
++    this.afterPackageName =
++      pkg.directory === this.directory
++        ? ""
++        : "/" + normalizePath__default["default"](path__namespace["default"].dirname(path__namespace["default"].relative(pkg.directory, filePath)));
+   }
+ 
+   get hasModuleField() {
+@@ -285,20 +305,26 @@ class Entrypoint extends Item {
+   get name() {
+     return this.package.name + this.afterPackageName;
+   }
+-
+ }
+ 
+ const EXTENSIONS = [".js", ".jsx", ".ts", ".tsx"];
+ const PKG_JSON_CONFIG_FIELD = "preconstruct";
+ 
+ let errors$1 = {
+-  noSource: source => `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
++  noSource: (source) =>
++    `no source file was provided, please create a file at ${source} or specify a custom source file with the ${PKG_JSON_CONFIG_FIELD} source option`,
+   deniedWriteMainField: "changing the main field is required to build",
+-  invalidField: (field, found, expected) => `${field} field ${found === undefined ? chalk__default["default"].red("was not found") : `is invalid, found \`${chalk__default["default"].red(JSON.stringify(found))}\``}, expected \`${chalk__default["default"].green(JSON.stringify(expected))}\``,
++  invalidField: (field, found, expected) =>
++    `${field} field ${
++      found === undefined
++        ? chalk__default["default"].red("was not found")
++        : `is invalid, found \`${chalk__default["default"].red(JSON.stringify(found))}\``
++    }, expected \`${chalk__default["default"].green(JSON.stringify(expected))}\``,
+   umdNameNotSpecified: `the umd:main field is specified but a umdName option is not specified. please add it to the ${PKG_JSON_CONFIG_FIELD} field in your package.json`,
+   noEntrypointPkgJson: "There is a missing package.json for an entrypoint",
+   noEntrypoints: "packages must have at least one entrypoint, this package has no entrypoints",
+-  fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit: field => `all entrypoints in a package must have the same fields and one entrypoint in this package has a ${field} field but you've declined the fix`,
++  fieldMustExistInAllEntrypointsIfExistsDeclinedFixDuringInit: (field) =>
++    `all entrypoints in a package must have the same fields and one entrypoint in this package has a ${field} field but you've declined the fix`,
+   missingBrowserConditionWithFieldPresent: `the exports field is configured and the browser field exists in this package but it is not specified in the preconstruct.exports.envConditions field`,
+   missingBrowserFieldWithConditionPresent: `the exports field is configured and the browser condition is set in preconstruct.exports.envConditions but the field is not present at the top-level`,
+   noModuleFieldWithExportsField: `when using the exports field, the module field must also be specified`
+@@ -309,7 +335,9 @@ let confirms = {
+   fixModuleField: createPromptConfirmLoader("would you like to fix the module field?"),
+   fixUmdBuild: createPromptConfirmLoader("would you like to fix the umd field?"),
+   fixBrowserField: createPromptConfirmLoader("would you like to fix the browser build?"),
+-  createEntrypointPkgJson: createPromptConfirmLoader("A package.json file does not exist for this entrypoint, would you like to create one automatically?"),
++  createEntrypointPkgJson: createPromptConfirmLoader(
++    "A package.json file does not exist for this entrypoint, would you like to create one automatically?"
++  ),
+   createEntrypoint: createPromptConfirmLoader("This glob does not match anything, would you like to create an entrypoint for it?")
+ };
+ let inputs = {
+@@ -317,7 +345,7 @@ let inputs = {
+   getSource: "what should the source file for this entrypoint be?"
+ };
+ let infos = {
+-  validField: field => `${field} field is valid`,
++  validField: (field) => `${field} field is valid`,
+   validEntrypoint: "a valid entry point exists.",
+   validPackageEntrypoints: "package entrypoints are valid"
+ };
+@@ -327,35 +355,39 @@ let successes = {
+ };
+ 
+ async function getUselessGlobsThatArentReallyGlobsForNewEntrypoints(globs, files, cwd) {
+-  let filesSet = new Set(files.map(x => normalizePath__default["default"](x)));
+-  return (await Promise.all(globs.map(async glob => {
+-    let parsedGlobResult = parseGlob__default["default"](glob);
++  let filesSet = new Set(files.map((x) => normalizePath__default["default"](x)));
++  return (
++    await Promise.all(
++      globs.map(async (glob) => {
++        let parsedGlobResult = parseGlob__default["default"](glob);
+ 
+-    if (!parsedGlobResult.is.glob) {
+-      let filename = normalizePath__default["default"](path__namespace["default"].resolve(cwd, "src", glob));
+-      if (filesSet.has(filename)) return;
++        if (!parsedGlobResult.is.glob) {
++          let filename = normalizePath__default["default"](path__namespace["default"].resolve(cwd, "src", glob));
++          if (filesSet.has(filename)) return;
++
++          try {
++            await fs__namespace.stat(filename);
++          } catch (err) {
++            if (err.code === "ENOENT") {
++              return {
++                filename,
++                glob,
++                exists: false
++              };
++            }
++
++            throw err;
++          }
+ 
+-      try {
+-        await fs__namespace.stat(filename);
+-      } catch (err) {
+-        if (err.code === "ENOENT") {
+           return {
+             filename,
+             glob,
+-            exists: false
++            exists: true
+           };
+         }
+-
+-        throw err;
+-      }
+-
+-      return {
+-        filename,
+-        glob,
+-        exists: true
+-      };
+-    }
+-  }))).filter(x => !!x);
++      })
++    )
++  ).filter((x) => !!x);
+ }
+ 
+ // for `imports` when it's going to be compiled away in what people import
+@@ -399,17 +431,19 @@ function parseImportsField(input) {
+     resolvedToConditions.get(resolvedString).push(combination);
+   }
+ 
+-  const buildToCombinations = new Map([...resolvedToConditions.values()].map(combinations => {
+-    let shortestCombination = combinations[0];
++  const buildToCombinations = new Map(
++    [...resolvedToConditions.values()].map((combinations) => {
++      let shortestCombination = combinations[0];
+ 
+-    for (const combination of combinations) {
+-      if (combination.length < shortestCombination.length) {
+-        shortestCombination = combination;
++      for (const combination of combinations) {
++        if (combination.length < shortestCombination.length) {
++          shortestCombination = combination;
++        }
+       }
+-    }
+ 
+-    return [shortestCombination, combinations];
+-  }));
++      return [shortestCombination, combinations];
++    })
++  );
+   return buildToCombinations;
+ }
+ function createExportsField(buildToCombinations, toLeaf) {
+@@ -421,13 +455,20 @@ function createExportsField(buildToCombinations, toLeaf) {
+     for (const condition of new Set(combinations.flat())) {
+       var _conditionsToInBuildC;
+ 
+-      conditionsToInBuildCount.set(condition, ((_conditionsToInBuildC = conditionsToInBuildCount.get(condition)) !== null && _conditionsToInBuildC !== void 0 ? _conditionsToInBuildC : 0) + 1);
++      conditionsToInBuildCount.set(
++        condition,
++        ((_conditionsToInBuildC = conditionsToInBuildCount.get(condition)) !== null && _conditionsToInBuildC !== void 0 ? _conditionsToInBuildC : 0) +
++          1
++      );
+     }
+ 
+     for (const condition of new Set(build)) {
+       var _conditionsToBuildCou;
+ 
+-      conditionsToBuildCount.set(condition, ((_conditionsToBuildCou = conditionsToBuildCount.get(condition)) !== null && _conditionsToBuildCou !== void 0 ? _conditionsToBuildCou : 0) + 1);
++      conditionsToBuildCount.set(
++        condition,
++        ((_conditionsToBuildCou = conditionsToBuildCount.get(condition)) !== null && _conditionsToBuildCou !== void 0 ? _conditionsToBuildCou : 0) + 1
++      );
+     }
+ 
+     const leaf = toLeaf(build);
+@@ -438,20 +479,34 @@ function createExportsField(buildToCombinations, toLeaf) {
+   } // i'm not totally sure if this is right or the best way to do this
+   // but it seems to work i think
+ 
+-
+   const conditionsInExportsFieldOrder = [...conditionsToInBuildCount.keys()].sort().sort((a, b) => {
+-    var _conditionsToBuildCou2, _conditionsToInBuildC2, _conditionsToBuildCou3, _conditionsToInBuildC3, _conditionsToInBuildC4, _conditionsToInBuildC5;
+-
+-    const aBuildVsInDiff = ((_conditionsToBuildCou2 = conditionsToBuildCount.get(a)) !== null && _conditionsToBuildCou2 !== void 0 ? _conditionsToBuildCou2 : 0) - ((_conditionsToInBuildC2 = conditionsToInBuildCount.get(a)) !== null && _conditionsToInBuildC2 !== void 0 ? _conditionsToInBuildC2 : 0);
+-    const bBuildVsInDiff = ((_conditionsToBuildCou3 = conditionsToBuildCount.get(b)) !== null && _conditionsToBuildCou3 !== void 0 ? _conditionsToBuildCou3 : 0) - ((_conditionsToInBuildC3 = conditionsToInBuildCount.get(b)) !== null && _conditionsToInBuildC3 !== void 0 ? _conditionsToInBuildC3 : 0);
++    var _conditionsToBuildCou2,
++      _conditionsToInBuildC2,
++      _conditionsToBuildCou3,
++      _conditionsToInBuildC3,
++      _conditionsToInBuildC4,
++      _conditionsToInBuildC5;
++
++    const aBuildVsInDiff =
++      ((_conditionsToBuildCou2 = conditionsToBuildCount.get(a)) !== null && _conditionsToBuildCou2 !== void 0 ? _conditionsToBuildCou2 : 0) -
++      ((_conditionsToInBuildC2 = conditionsToInBuildCount.get(a)) !== null && _conditionsToInBuildC2 !== void 0 ? _conditionsToInBuildC2 : 0);
++    const bBuildVsInDiff =
++      ((_conditionsToBuildCou3 = conditionsToBuildCount.get(b)) !== null && _conditionsToBuildCou3 !== void 0 ? _conditionsToBuildCou3 : 0) -
++      ((_conditionsToInBuildC3 = conditionsToInBuildCount.get(b)) !== null && _conditionsToInBuildC3 !== void 0 ? _conditionsToInBuildC3 : 0);
+ 
+     if (aBuildVsInDiff === 0 && bBuildVsInDiff === 0) {
+       var _conditionsToBuildCou4, _conditionsToBuildCou5;
+ 
+-      return ((_conditionsToBuildCou4 = conditionsToBuildCount.get(b)) !== null && _conditionsToBuildCou4 !== void 0 ? _conditionsToBuildCou4 : 0) - ((_conditionsToBuildCou5 = conditionsToBuildCount.get(a)) !== null && _conditionsToBuildCou5 !== void 0 ? _conditionsToBuildCou5 : 0);
++      return (
++        ((_conditionsToBuildCou4 = conditionsToBuildCount.get(b)) !== null && _conditionsToBuildCou4 !== void 0 ? _conditionsToBuildCou4 : 0) -
++        ((_conditionsToBuildCou5 = conditionsToBuildCount.get(a)) !== null && _conditionsToBuildCou5 !== void 0 ? _conditionsToBuildCou5 : 0)
++      );
+     }
+ 
+-    return ((_conditionsToInBuildC4 = conditionsToInBuildCount.get(a)) !== null && _conditionsToInBuildC4 !== void 0 ? _conditionsToInBuildC4 : 0) - ((_conditionsToInBuildC5 = conditionsToInBuildCount.get(b)) !== null && _conditionsToInBuildC5 !== void 0 ? _conditionsToInBuildC5 : 0);
++    return (
++      ((_conditionsToInBuildC4 = conditionsToInBuildCount.get(a)) !== null && _conditionsToInBuildC4 !== void 0 ? _conditionsToInBuildC4 : 0) -
++      ((_conditionsToInBuildC5 = conditionsToInBuildCount.get(b)) !== null && _conditionsToInBuildC5 !== void 0 ? _conditionsToInBuildC5 : 0)
++    );
+   });
+   return _createExportsField(conditionsInExportsFieldOrder, [], combinationsToBuild);
+ }
+@@ -484,9 +539,12 @@ function _createExportsField(combinationsLeft, parentCombinations, combinationTo
+     };
+   }
+ 
+-  return _objectSpread({
+-    [currentCondition]: withCurrent
+-  }, withoutCurrent);
++  return _objectSpread(
++    {
++      [currentCondition]: withCurrent
++    },
++    withoutCurrent
++  );
+ }
+ 
+ function resolveConditions(written, combination) {
+@@ -551,14 +609,21 @@ function setFieldInOrder(obj, field, value) {
+   }
+ 
+   let fieldIndex = fields.indexOf(field);
+-  let idealField = fields.slice(0, fieldIndex).reverse().find(key => {
+-    return key in obj;
+-  });
++  let idealField = fields
++    .slice(0, fieldIndex)
++    .reverse()
++    .find((key) => {
++      return key in obj;
++    });
+ 
+   if (idealField === undefined) {
+-    return _objectSpread(_objectSpread({}, obj), {}, {
+-      [field]: value
+-    });
++    return _objectSpread(
++      _objectSpread({}, obj),
++      {},
++      {
++        [field]: value
++      }
++    );
+   }
+ 
+   let newObj = {};
+@@ -574,7 +639,9 @@ function setFieldInOrder(obj, field, value) {
+   return newObj;
+ }
+ function getEntrypointName(pkg, entrypointDir) {
+-  return normalizePath__default["default"](path__namespace.join(pkg.name, path__namespace.relative(pkg.directory, path__namespace.resolve(pkg.directory, entrypointDir))));
++  return normalizePath__default["default"](
++    path__namespace.join(pkg.name, path__namespace.relative(pkg.directory, path__namespace.resolve(pkg.directory, entrypointDir)))
++  );
+ }
+ function getBaseDistName(entrypoint) {
+   const strategy = entrypoint.package.distFilenameStrategy;
+@@ -600,27 +667,50 @@ function exportsField(pkg) {
+     const hasSomeConditions = exportsFieldConfig.conditions.groups.size !== 0;
+ 
+     for (const entrypoint of pkg.entrypoints) {
+-      output["." + entrypoint.afterPackageName] = _objectSpread(_objectSpread({}, hasSomeConditions && {
+-        // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
+-        // TODO: this should probably only be here if you're using ts
+-        // or maybe we just generate more .d.ts files in the dist rather than having a types condition
+-        types: exportsFieldConfig.importConditionDefaultExport === "default" ? {
+-          import: getExportsFieldOutputPathForConditions(entrypoint, ["import"]),
+-          default: getExportsFieldOutputPathForConditions(entrypoint, [])
+-        } : getExportsFieldOutputPathForConditions(entrypoint, [])
+-      }), createExportsField(exportsFieldConfig.conditions.groups, conditions => _objectSpread(_objectSpread({
+-        module: getExportsFieldOutputPathForConditions(entrypoint, conditions.concat("module"))
+-      }, exportsFieldConfig.importConditionDefaultExport === "default" && {
+-        import: getExportsFieldOutputPathForConditions(entrypoint, conditions.concat("import"))
+-      }), {}, {
+-        default: getExportsFieldOutputPathForConditions(entrypoint, conditions)
+-      })));
++      output["." + entrypoint.afterPackageName] = _objectSpread(
++        _objectSpread(
++          {},
++          hasSomeConditions && {
++            // yes, i'm very intentionally pointing at the .js/.mjs rather than the .d.ts/.d.mts
++            // TODO: this should probably only be here if you're using ts
++            // or maybe we just generate more .d.ts files in the dist rather than having a types condition
++            types:
++              exportsFieldConfig.importConditionDefaultExport === "default"
++                ? {
++                    import: getExportsFieldOutputPathForConditions(entrypoint, ["import"]),
++                    default: getExportsFieldOutputPathForConditions(entrypoint, [])
++                  }
++                : getExportsFieldOutputPathForConditions(entrypoint, [])
++          }
++        ),
++        createExportsField(exportsFieldConfig.conditions.groups, (conditions) =>
++          _objectSpread(
++            _objectSpread(
++              {
++                module: getExportsFieldOutputPathForConditions(entrypoint, conditions.concat("module"))
++              },
++              exportsFieldConfig.importConditionDefaultExport === "default" && {
++                import: getExportsFieldOutputPathForConditions(entrypoint, conditions.concat("import"))
++              }
++            ),
++            {},
++            {
++              default: getExportsFieldOutputPathForConditions(entrypoint, conditions)
++            }
++          )
++        )
++      );
+     }
+   }
+ 
+-  return _objectSpread(_objectSpread({}, output), {}, {
+-    "./package.json": "./package.json"
+-  }, exportsFieldConfig.extra);
++  return _objectSpread(
++    _objectSpread({}, output),
++    {},
++    {
++      "./package.json": "./package.json"
++    },
++    exportsFieldConfig.extra
++  );
+ }
+ 
+ function exportsFieldForLegacyConditions(pkg, envs, importConditionDefaultExport) {
+@@ -629,19 +719,38 @@ function exportsFieldForLegacyConditions(pkg, envs, importConditionDefaultExport
+   for (const entrypoint of pkg.entrypoints) {
+     const esmBuild = getExportsFieldOutputPath(entrypoint, "esm");
+ 
+-    const exportConditions = _objectSpread(_objectSpread({
+-      module: envs.size ? _objectSpread(_objectSpread(_objectSpread({}, envs.has("worker") && {
+-        worker: getExportsFieldOutputPath(entrypoint, "worker")
+-      }), envs.has("browser") && {
+-        browser: getExportsFieldOutputPath(entrypoint, "browser-esm")
+-      }), {}, {
+-        default: esmBuild
+-      }) : esmBuild
+-    }, importConditionDefaultExport === "default" && {
+-      import: getExportsImportUnwrappingDefaultOutputPath(entrypoint)
+-    }), {}, {
+-      default: getExportsFieldOutputPath(entrypoint, "cjs")
+-    });
++    const exportConditions = _objectSpread(
++      _objectSpread(
++        {
++          module: envs.size
++            ? _objectSpread(
++                _objectSpread(
++                  _objectSpread(
++                    {},
++                    envs.has("worker") && {
++                      worker: getExportsFieldOutputPath(entrypoint, "worker")
++                    }
++                  ),
++                  envs.has("browser") && {
++                    browser: getExportsFieldOutputPath(entrypoint, "browser-esm")
++                  }
++                ),
++                {},
++                {
++                  default: esmBuild
++                }
++              )
++            : esmBuild
++        },
++        importConditionDefaultExport === "default" && {
++          import: getExportsImportUnwrappingDefaultOutputPath(entrypoint)
++        }
++      ),
++      {},
++      {
++        default: getExportsFieldOutputPath(entrypoint, "cjs")
++      }
++    );
+ 
+     output["." + entrypoint.afterPackageName] = exportConditions;
+   }
+@@ -735,11 +844,13 @@ const validFieldsForEntrypoint = {
+       return moduleBuild;
+     }
+ 
+-    return _objectSpread({
+-      [`./${getDistFilename(entrypoint, "cjs")}`]: `./${getDistFilename(entrypoint, "browser-cjs")}`
+-    }, entrypoint.hasModuleField && moduleBuild);
++    return _objectSpread(
++      {
++        [`./${getDistFilename(entrypoint, "cjs")}`]: `./${getDistFilename(entrypoint, "browser-cjs")}`
++      },
++      entrypoint.hasModuleField && moduleBuild
++    );
+   }
+-
+ };
+ function flowTemplate(hasDefaultExport, relativePath) {
+   const escapedPath = JSON.stringify(relativePath);
+@@ -762,8 +873,7 @@ function getReexportStatement(namedExports, source) {
+     return `import ${source};`;
+   } // rollup will say a chunk has a "*external-pkg" export when it has an export * from 'external-pkg'
+ 
+-
+-  if (namedExports.some(exported => exported[0] === "*")) {
++  if (namedExports.some((exported) => exported[0] === "*")) {
+     return `export * from ${source};`;
+   }
+ 
+@@ -784,9 +894,13 @@ function dtsDefaultForDmtsTemplate(relativePath) {
+ }
+ function mjsTemplate(exports, relativePath, mjsPath) {
+   const escapedPath = JSON.stringify(relativePath);
+-  const nonDefaultExports = exports.filter(name => name !== "default");
++  const nonDefaultExports = exports.filter((name) => name !== "default");
+   const hasDefaultExport = exports.length !== nonDefaultExports.length;
+-  return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${hasDefaultExport ? `export { _default as default } from ${JSON.stringify("./" + getJsDefaultForMjsFilepath(path__namespace.basename(mjsPath)))};\n` : ""}`;
++  return `${getReexportStatement(nonDefaultExports, escapedPath)}\n${
++    hasDefaultExport
++      ? `export { _default as default } from ${JSON.stringify("./" + getJsDefaultForMjsFilepath(path__namespace.basename(mjsPath)))};\n`
++      : ""
++  }`;
+ } // the only reason we sometimes name exports explicitly in the mjs template is
+ // to avoid adding __esModule as an export, this doesn't apply to the .d.mts
+ // since __esModule doesn't exist in declaration files
+@@ -794,24 +908,33 @@ function mjsTemplate(exports, relativePath, mjsPath) {
+ // getting the type-only exports
+ 
+ function dmtsTemplate(filename, hasDefaultExport, relativePath) {
+-  return `export * from ${JSON.stringify(relativePath)};\n${hasDefaultExport ? `export { _default as default } from ${JSON.stringify("./" + path__namespace.basename(filename).replace(/\.d\.mts$/, ".default.js"))};\n` : ""}//# sourceMappingURL=${filename}.map\n`;
++  return `export * from ${JSON.stringify(relativePath)};\n${
++    hasDefaultExport
++      ? `export { _default as default } from ${JSON.stringify("./" + path__namespace.basename(filename).replace(/\.d\.mts$/, ".default.js"))};\n`
++      : ""
++  }//# sourceMappingURL=${filename}.map\n`;
+ }
+ function tsReexportDeclMap(dtsFilename, relativePathWithExtension) {
+-  return JSON.stringify({
+-    version: 3,
+-    file: dtsFilename,
+-    sourceRoot: "",
+-    sources: [relativePathWithExtension],
+-    names: [],
+-    mappings: "AAAA"
+-  }) + "\n";
++  return (
++    JSON.stringify({
++      version: 3,
++      file: dtsFilename,
++      sourceRoot: "",
++      sources: [relativePathWithExtension],
++      names: [],
++      mappings: "AAAA"
++    }) + "\n"
++  );
+ }
+ function parseImportConditionDefaultExportOption(value, name) {
+   if (value === "default" || value === "namespace") {
+     return value;
+   }
+ 
+-  throw new FatalError('the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present', name);
++  throw new FatalError(
++    'the "preconstruct.exports.importConditionDefaultExport" field must be set to "default" or "namespace" if it is present',
++    name
++  );
+ }
+ 
+ function getFieldsUsedInEntrypoints(descriptors) {
+@@ -851,30 +974,27 @@ function getPlainEntrypointContent(pkg, fields, entrypointDir, indent) {
+ 
+ function createEntrypoints(pkg, descriptors) {
+   let fields = getFieldsUsedInEntrypoints(descriptors);
+-  return Promise.all(descriptors.map(async ({
+-    filename,
+-    contents,
+-    hasAccepted,
+-    sourceFile
+-  }) => {
+-    if (contents === undefined) {
+-      if (!hasAccepted) {
+-        const entrypointName = getEntrypointName(pkg, path__namespace["default"].dirname(filename));
+-        let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson({
+-          name: entrypointName
+-        });
++  return Promise.all(
++    descriptors.map(async ({ filename, contents, hasAccepted, sourceFile }) => {
++      if (contents === undefined) {
++        if (!hasAccepted) {
++          const entrypointName = getEntrypointName(pkg, path__namespace["default"].dirname(filename));
++          let shouldCreateEntrypointPkgJson = await confirms.createEntrypointPkgJson({
++            name: entrypointName
++          });
+ 
+-        if (!shouldCreateEntrypointPkgJson) {
+-          throw new FatalError(errors$1.noEntrypointPkgJson, entrypointName);
++          if (!shouldCreateEntrypointPkgJson) {
++            throw new FatalError(errors$1.noEntrypointPkgJson, entrypointName);
++          }
+         }
+-      }
+ 
+-      contents = getPlainEntrypointContent(pkg, fields, path__namespace["default"].dirname(filename), pkg.indent);
+-      await fs__namespace.outputFile(filename, contents);
+-    }
++        contents = getPlainEntrypointContent(pkg, fields, path__namespace["default"].dirname(filename), pkg.indent);
++        await fs__namespace.outputFile(filename, contents);
++      }
+ 
+-    return new Entrypoint(filename, contents, pkg, sourceFile);
+-  }));
++      return new Entrypoint(filename, contents, pkg, sourceFile);
++    })
++  );
+ }
+ 
+ class Package extends Item {
+@@ -893,7 +1013,7 @@ class Package extends Item {
+       return ["index.{js,jsx,ts,tsx}"];
+     }
+ 
+-    if (Array.isArray(this.json.preconstruct.entrypoints) && this.json.preconstruct.entrypoints.every(x => typeof x === "string")) {
++    if (Array.isArray(this.json.preconstruct.entrypoints) && this.json.preconstruct.entrypoints.every((x) => typeof x === "string")) {
+       return this.json.preconstruct.entrypoints;
+     }
+ 
+@@ -912,16 +1032,18 @@ class Package extends Item {
+     }); // sorting the entrypoints is important since we want to have something consistent
+     // to write into the `exports` field and file systems don't guarantee an order
+ 
+-    entrypoints = [...entrypoints.sort((a, b) => {
+-      // shortest entrypoints first since shorter entrypoints
+-      // are generally more commonly used
+-      const comparison = a.length - b.length;
+-      if (comparison !== 0) return comparison; // then .sort's default behaviour because we just need something stable
++    entrypoints = [
++      ...entrypoints.sort((a, b) => {
++        // shortest entrypoints first since shorter entrypoints
++        // are generally more commonly used
++        const comparison = a.length - b.length;
++        if (comparison !== 0) return comparison; // then .sort's default behaviour because we just need something stable
+ 
+-      if (a < b) return -1;
+-      if (b > a) return 1;
+-      return 0;
+-    })];
++        if (a < b) return -1;
++        if (b > a) return 1;
++        return 0;
++      })
++    ];
+ 
+     if (!entrypoints.length) {
+       let oldEntrypoints = await fastGlob__default["default"](pkg.configEntrypoints, {
+@@ -931,51 +1053,85 @@ class Package extends Item {
+       });
+ 
+       if (oldEntrypoints.length) {
+-        throw new FatalError("this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade", pkg.name);
++        throw new FatalError(
++          "this package has no entrypoints but it does have some using v1's entrypoints config, please see the the changelog for how to upgrade",
++          pkg.name
++        );
+       }
+     }
+ 
+-    pkg.entrypoints = await Promise.all(entrypoints.map(async sourceFile => {
+-      if (!/\.[tj]sx?$/.test(sourceFile)) {
+-        throw new FatalError(`entrypoint source files must end in .js, .jsx, .ts or .tsx but ${path__namespace["default"].relative(pkg.directory, sourceFile)} does not`, pkg.name);
+-      }
++    pkg.entrypoints = await Promise.all(
++      entrypoints.map(async (sourceFile) => {
++        if (!/\.[tj]sx?$/.test(sourceFile)) {
++          throw new FatalError(
++            `entrypoint source files must end in .js, .jsx, .ts or .tsx but ${path__namespace["default"].relative(
++              pkg.directory,
++              sourceFile
++            )} does not`,
++            pkg.name
++          );
++        }
+ 
+-      if (!normalizePath__default["default"](sourceFile).includes(normalizePath__default["default"](path__namespace["default"].join(pkg.directory, "src")))) {
+-        throw new FatalError(`entrypoint source files must be inside of the src directory of a package but ${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, sourceFile))} is not`, pkg.name);
+-      }
++        if (
++          !normalizePath__default["default"](sourceFile).includes(
++            normalizePath__default["default"](path__namespace["default"].join(pkg.directory, "src"))
++          )
++        ) {
++          throw new FatalError(
++            `entrypoint source files must be inside of the src directory of a package but ${normalizePath__default["default"](
++              path__namespace["default"].relative(pkg.directory, sourceFile)
++            )} is not`,
++            pkg.name
++          );
++        }
+ 
+-      let directory = path__namespace["default"].join(pkg.directory, path__namespace["default"].resolve(sourceFile).replace(path__namespace["default"].join(pkg.directory, "src"), "").replace(/\.[tj]sx?$/, ""));
++        let directory = path__namespace["default"].join(
++          pkg.directory,
++          path__namespace["default"]
++            .resolve(sourceFile)
++            .replace(path__namespace["default"].join(pkg.directory, "src"), "")
++            .replace(/\.[tj]sx?$/, "")
++        );
+ 
+-      if (path__namespace["default"].basename(directory) === "index") {
+-        directory = path__namespace["default"].dirname(directory);
+-      }
++        if (path__namespace["default"].basename(directory) === "index") {
++          directory = path__namespace["default"].dirname(directory);
++        }
+ 
+-      let filename = path__namespace["default"].join(directory, "package.json");
+-      let contents = undefined;
++        let filename = path__namespace["default"].join(directory, "package.json");
++        let contents = undefined;
+ 
+-      try {
+-        contents = await fs__namespace.readFile(filename, "utf-8");
+-      } catch (e) {
+-        if (e.code !== "ENOENT") {
+-          throw e;
++        try {
++          contents = await fs__namespace.readFile(filename, "utf-8");
++        } catch (e) {
++          if (e.code !== "ENOENT") {
++            throw e;
++          }
+         }
+-      }
+ 
+-      return {
+-        filename,
+-        contents,
+-        sourceFile,
+-        hasAccepted: isFix
+-      };
+-    })).then(async descriptors => {
++        return {
++          filename,
++          contents,
++          sourceFile,
++          hasAccepted: isFix
++        };
++      })
++    ).then(async (descriptors) => {
+       const globErrors = await getUselessGlobsThatArentReallyGlobsForNewEntrypoints(pkg.configEntrypoints, entrypoints, pkg.directory);
+ 
+       if (globErrors.length) {
+-        let errors = globErrors.map(globError => {
++        let errors = globErrors.map((globError) => {
+           if (globError.exists) {
+-            return new FatalError(`specifies a entrypoint ${JSON.stringify(globError.glob)} but it is negated in the same config so it should be removed or the config should be fixed`, pkg.name);
++            return new FatalError(
++              `specifies a entrypoint ${JSON.stringify(
++                globError.glob
++              )} but it is negated in the same config so it should be removed or the config should be fixed`,
++              pkg.name
++            );
+           } else {
+-            return new FatalError(`specifies a entrypoint ${JSON.stringify(globError.glob)} but the file does not exist, please create it or fix the config`, pkg.name);
++            return new FatalError(
++              `specifies a entrypoint ${JSON.stringify(globError.glob)} but the file does not exist, please create it or fix the config`,
++              pkg.name
++            );
+           }
+         });
+ 
+@@ -990,11 +1146,19 @@ class Package extends Item {
+ 
+     for (const entrypoint of pkg.entrypoints) {
+       if (entrypoint.json.preconstruct.source !== undefined) {
+-        throw new FatalError("The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config", this.name);
++        throw new FatalError(
++          "The source option on entrypoints no longer exists, see the changelog for how to upgrade to the new entrypoints config",
++          this.name
++        );
+       }
+ 
+       if (entrypointsWithSourcePath.has(entrypoint.name)) {
+-        throw new FatalError(`this package has multiple source files for the same entrypoint of ${entrypoint.name} at ${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, entrypointsWithSourcePath.get(entrypoint.name)))} and ${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, entrypoint.source))}`, pkg.name);
++        throw new FatalError(
++          `this package has multiple source files for the same entrypoint of ${entrypoint.name} at ${normalizePath__default["default"](
++            path__namespace["default"].relative(pkg.directory, entrypointsWithSourcePath.get(entrypoint.name))
++          )} and ${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, entrypoint.source))}`,
++          pkg.name
++        );
+       }
+ 
+       entrypointsWithSourcePath.set(entrypoint.name, entrypoint.source);
+@@ -1004,7 +1168,7 @@ class Package extends Item {
+   }
+ 
+   setFieldOnEntrypoints(field) {
+-    this.entrypoints.forEach(entrypoint => {
++    this.entrypoints.forEach((entrypoint) => {
+       entrypoint.json = setFieldInOrder(entrypoint.json, field, validFieldsForEntrypoint[field](entrypoint));
+     });
+   }
+@@ -1022,7 +1186,12 @@ class Package extends Item {
+       const written = this.project.json.preconstruct.distFilenameStrategy;
+ 
+       if (written !== "full" && written !== "unscoped-package-name") {
+-        throw new FatalError(`distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(written)} but the only accepted values are "full" and "unscoped-package-name"`, this.project.name);
++        throw new FatalError(
++          `distFilenameStrategy is defined in your Preconstruct config as ${JSON.stringify(
++            written
++          )} but the only accepted values are "full" and "unscoped-package-name"`,
++          this.project.name
++        );
+       }
+ 
+       return written;
+@@ -1040,28 +1209,40 @@ class Package extends Item {
+       }
+     }
+ 
+-    return parseExportsFieldConfig(this.json.preconstruct.exports, this.project.directory !== this.directory ? this.project.exportsFieldConfig() : undefined, this.name, this._parsedImportsGroups);
++    return parseExportsFieldConfig(
++      this.json.preconstruct.exports,
++      this.project.directory !== this.directory ? this.project.exportsFieldConfig() : undefined,
++      this.name,
++      this._parsedImportsGroups
++    );
+   }
+-
+ }
+ 
+ function parseExportsFieldConfig(config, defaultExportFieldConfig, name, importsConditions) {
+   var _defaultExportFieldCo;
+ 
+-  if (config === false || config === undefined && defaultExportFieldConfig === undefined) {
++  if (config === false || (config === undefined && defaultExportFieldConfig === undefined)) {
+     return undefined;
+   }
+ 
+   const parsedConfig = {
+-    conditions: importsConditions === false ? {
+-      kind: "legacy",
+-      envs: new Set()
+-    } : {
+-      kind: "imports",
+-      groups: importsConditions
+-    },
++    conditions:
++      importsConditions === false
++        ? {
++            kind: "legacy",
++            envs: new Set()
++          }
++        : {
++            kind: "imports",
++            groups: importsConditions
++          },
+     extra: {},
+-    importConditionDefaultExport: (_defaultExportFieldCo = defaultExportFieldConfig === null || defaultExportFieldConfig === void 0 ? void 0 : defaultExportFieldConfig.importConditionDefaultExport) !== null && _defaultExportFieldCo !== void 0 ? _defaultExportFieldCo : "namespace"
++    importConditionDefaultExport:
++      (_defaultExportFieldCo =
++        defaultExportFieldConfig === null || defaultExportFieldConfig === void 0 ? void 0 : defaultExportFieldConfig.importConditionDefaultExport) !==
++        null && _defaultExportFieldCo !== void 0
++        ? _defaultExportFieldCo
++        : "namespace"
+   };
+ 
+   if (config === true || config === undefined) {
+@@ -1084,14 +1265,17 @@ function parseExportsFieldConfig(config, defaultExportFieldConfig, name, imports
+         throw new FatalError('the "preconstruct.exports.envConditions" field is not supported when the imports conditions feature is enabled', name);
+       }
+ 
+-      if (Array.isArray(value) && value.every(v => v === "worker" || v === "browser")) {
++      if (Array.isArray(value) && value.every((v) => v === "worker" || v === "browser")) {
+         parsedConfig.conditions.envs = new Set(value);
+ 
+         if (parsedConfig.conditions.envs.size !== value.length) {
+           throw new FatalError('the "preconstruct.exports.envConditions" field must not have duplicates', name);
+         }
+       } else {
+-        throw new FatalError('the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present', name);
++        throw new FatalError(
++          'the "preconstruct.exports.envConditions" field must be an array containing zero or more of "worker" and "browser" if it is present',
++          name
++        );
+       }
+     } else if (key === "importConditionDefaultExport") {
+       parsedConfig.importConditionDefaultExport = parseImportConditionDefaultExportOption(value, name);
+@@ -1106,11 +1290,15 @@ function parseExportsFieldConfig(config, defaultExportFieldConfig, name, imports
+ async function validateIncludedFiles(pkg) {
+   try {
+     const rootDistDirectoryTestFilepath = path__namespace["default"].join(pkg.directory, "dist", "preconstruct-test-file");
+-    const hasNoEntrypointAtRootOfPackage = pkg.entrypoints.every(entrypoint => entrypoint.directory !== pkg.directory);
+-    await Promise.all(pkg.entrypoints.map(async entrypoint => {
+-      let filename = path__namespace["default"].join(entrypoint.directory, "dist", "preconstruct-test-file");
+-      return fs__namespace.outputFile(filename, "test content");
+-    }).concat(hasNoEntrypointAtRootOfPackage ? fs__namespace.outputFile(rootDistDirectoryTestFilepath, "test content") : []));
++    const hasNoEntrypointAtRootOfPackage = pkg.entrypoints.every((entrypoint) => entrypoint.directory !== pkg.directory);
++    await Promise.all(
++      pkg.entrypoints
++        .map(async (entrypoint) => {
++          let filename = path__namespace["default"].join(entrypoint.directory, "dist", "preconstruct-test-file");
++          return fs__namespace.outputFile(filename, "test content");
++        })
++        .concat(hasNoEntrypointAtRootOfPackage ? fs__namespace.outputFile(rootDistDirectoryTestFilepath, "test content") : [])
++    );
+     let packedFilesArr = await packlist__default["default"]({
+       path: pkg.directory
+     }); // Ensure consistent path separators. Without this, there's a mismatch between this result and the path it
+@@ -1118,41 +1306,66 @@ async function validateIncludedFiles(pkg) {
+     // of distFilePath below will have a backslash (dist\preconstruct-test-file). Obviously these two won't match,
+     // so the distfile check will fail.
+ 
+-    let result = new Set(packedFilesArr.map(p => path__namespace["default"].normalize(p))); // check that we're including the package.json and main file
++    let result = new Set(packedFilesArr.map((p) => path__namespace["default"].normalize(p))); // check that we're including the package.json and main file
+     // TODO: add Flow and TS check and if they're ignored, don't write them
+ 
+     let messages = [];
+-    pkg.entrypoints.forEach(entrypoint => {
++    pkg.entrypoints.forEach((entrypoint) => {
+       let pkgJsonPath = path__namespace["default"].relative(pkg.directory, path__namespace["default"].resolve(entrypoint.directory, "package.json"));
+-      let distFilePath = path__namespace["default"].relative(pkg.directory, path__namespace["default"].resolve(entrypoint.directory, "dist", "preconstruct-test-file"));
++      let distFilePath = path__namespace["default"].relative(
++        pkg.directory,
++        path__namespace["default"].resolve(entrypoint.directory, "dist", "preconstruct-test-file")
++      );
+       let entrypointName = path__namespace["default"].relative(pkg.directory, entrypoint.directory);
+ 
+       if (!result.has(pkgJsonPath)) {
+-        messages.push(`the entrypoint ${chalk__default["default"].cyan(entrypointName)} isn't included in the published files for this package, please add it to the files field in the package's package.json`);
++        messages.push(
++          `the entrypoint ${chalk__default["default"].cyan(
++            entrypointName
++          )} isn't included in the published files for this package, please add it to the files field in the package's package.json`
++        );
+       } else if (!result.has(distFilePath)) {
+-        messages.push(`the dist directory ${entrypointName === "" ? "" : `for entrypoint ${chalk__default["default"].cyan(entrypointName)} `}isn't included in the published files for this package, please add it to the files field in the package's package.json`);
++        messages.push(
++          `the dist directory ${
++            entrypointName === "" ? "" : `for entrypoint ${chalk__default["default"].cyan(entrypointName)} `
++          }isn't included in the published files for this package, please add it to the files field in the package's package.json`
++        );
+       }
+     });
+ 
+     if (hasNoEntrypointAtRootOfPackage && !result.has(path__namespace["default"].relative(pkg.directory, rootDistDirectoryTestFilepath))) {
+-      messages.push("the dist directory in the root of the package isn't included in the published files for this package, please add it to the files field in the package's package.json.\nthough this package does not have an entrypoint at the root of the package, preconstruct will write common chunks to the root dist directory so it must be included.");
++      messages.push(
++        "the dist directory in the root of the package isn't included in the published files for this package, please add it to the files field in the package's package.json.\nthough this package does not have an entrypoint at the root of the package, preconstruct will write common chunks to the root dist directory so it must be included."
++      );
+     }
+ 
+     if (messages.length) {
+       throw new FatalError(messages.join("\n"), pkg.name);
+     }
+   } finally {
+-    await Promise.all(pkg.entrypoints.map(entrypoint => fs__namespace.remove(path__namespace["default"].join(entrypoint.directory, "dist", "preconstruct-test-file"))));
++    await Promise.all(
++      pkg.entrypoints.map((entrypoint) =>
++        fs__namespace.remove(path__namespace["default"].join(entrypoint.directory, "dist", "preconstruct-test-file"))
++      )
++    );
+   }
+ }
+ 
+-const allSettled = promises => Promise.all(promises.map(promise => promise.then(value => ({
+-  status: "fulfilled",
+-  value
+-}), reason => ({
+-  status: "rejected",
+-  reason
+-}))));
++const allSettled = (promises) =>
++  Promise.all(
++    promises.map((promise) =>
++      promise.then(
++        (value) => ({
++          status: "fulfilled",
++          value
++        }),
++        (reason) => ({
++          status: "rejected",
++          reason
++        })
++      )
++    )
++  );
+ 
+ class Project extends Item {
+   constructor(...args) {
+@@ -1175,7 +1388,7 @@ class Project extends Item {
+       return ["."];
+     }
+ 
+-    if (Array.isArray(this.json.preconstruct.packages) && this.json.preconstruct.packages.every(x => typeof x === "string")) {
++    if (Array.isArray(this.json.preconstruct.packages) && this.json.preconstruct.packages.every((x) => typeof x === "string")) {
+       return this.json.preconstruct.packages;
+     }
+ 
+@@ -1222,18 +1435,20 @@ class Project extends Item {
+       absolute: true
+     });
+     let packages = [];
+-    await Promise.all(filenames.map(async x => {
+-      try {
+-        packages.push((await Package.create(x, this, isFix)));
+-      } catch (err) {
+-        if (err.code === "ENOENT" && err.path === path__namespace["default"].join(x, "package.json")) {
+-          return;
+-        }
++    await Promise.all(
++      filenames.map(async (x) => {
++        try {
++          packages.push(await Package.create(x, this, isFix));
++        } catch (err) {
++          if (err.code === "ENOENT" && err.path === path__namespace["default"].join(x, "package.json")) {
++            return;
++          }
+ 
+-        throw err;
+-      }
+-    }));
+-    const errored = (await allSettled(packages.map(pkg => validateIncludedFiles(pkg)))).find(result => result.status === "rejected");
++          throw err;
++        }
++      })
++    );
++    const errored = (await allSettled(packages.map((pkg) => validateIncludedFiles(pkg)))).find((result) => result.status === "rejected");
+ 
+     if (errored) {
+       // TS can't refine type based on .find predicate
+@@ -1279,7 +1494,6 @@ class Project extends Item {
+       importConditionDefaultExport
+     };
+   }
+-
+ }
+ 
+ let keys$1 = Object.keys;
+@@ -1296,7 +1510,6 @@ function validatePackage(pkg) {
+     module: pkg.entrypoints[0].json.module !== undefined,
+     "umd:main": pkg.entrypoints[0].json["umd:main"] !== undefined,
+     browser: pkg.entrypoints[0].json.browser !== undefined // "exports" is not here because it is not like these fields, it exists on a package, not an entrypoint
+-
+   };
+   const exportsFieldConfig = pkg.exportsFieldConfig();
+ 
+@@ -1323,14 +1536,20 @@ function validatePackage(pkg) {
+     throw new FixableError(errors$1.invalidField("exports", pkg.json.exports, exportsField(pkg)), pkg.name);
+   }
+ 
+-  pkg.entrypoints.forEach(entrypoint => {
+-    keys$1(fields).forEach(field => {
++  pkg.entrypoints.forEach((entrypoint) => {
++    keys$1(fields).forEach((field) => {
+       if (entrypoint.json[field] && !fields[field]) {
+-        throw new FixableError(`${entrypoint.name} has a ${field} build but ${pkg.entrypoints[0].name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`, pkg.name);
++        throw new FixableError(
++          `${entrypoint.name} has a ${field} build but ${pkg.entrypoints[0].name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
++          pkg.name
++        );
+       }
+ 
+       if (!entrypoint.json[field] && fields[field]) {
+-        throw new FixableError(`${pkg.entrypoints[0].name} has a ${field} build but ${entrypoint.name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`, pkg.name);
++        throw new FixableError(
++          `${pkg.entrypoints[0].name} has a ${field} build but ${entrypoint.name} does not have a ${field} build. Entrypoints in a package must either all have a particular build type or all not have a particular build type.`,
++          pkg.name
++        );
+       }
+     });
+   }); // TODO: do this well
+@@ -1341,7 +1560,10 @@ function validatePackage(pkg) {
+     // i don't think it's worth implementing this well at this exact moment
+     // because i'm guessing doing it well would cause more problems than it would solve
+     // this will likely change in the future
+-    let sortaAllDeps = new Set([...(pkg.json.peerDependencies ? Object.keys(pkg.json.peerDependencies) : []), ...(pkg.json.dependencies ? Object.keys(pkg.json.dependencies) : [])]);
++    let sortaAllDeps = new Set([
++      ...(pkg.json.peerDependencies ? Object.keys(pkg.json.peerDependencies) : []),
++      ...(pkg.json.dependencies ? Object.keys(pkg.json.dependencies) : [])
++    ]);
+ 
+     for (let depName in pkg.json.dependencies) {
+       let depPkgJson;
+@@ -1362,7 +1584,16 @@ function validatePackage(pkg) {
+       if (depPkgJson.peerDependencies) {
+         for (let pkgName in depPkgJson.peerDependencies) {
+           if (!sortaAllDeps.has(pkgName)) {
+-            throw new FatalError(`the package ${chalk__default["default"].blue(pkg.name)} depends on ${chalk__default["default"].blue(depName)} which has a peerDependency on ${chalk__default["default"].blue(pkgName)} but ${chalk__default["default"].blue(pkgName)} is not specified in the dependencies or peerDependencies of ${chalk__default["default"].blue(pkg.name)}. please add ${chalk__default["default"].blue(pkgName)} to the dependencies or peerDependencies of ${chalk__default["default"].blue(pkg.name)}`, pkg.name);
++            throw new FatalError(
++              `the package ${chalk__default["default"].blue(pkg.name)} depends on ${chalk__default["default"].blue(
++                depName
++              )} which has a peerDependency on ${chalk__default["default"].blue(pkgName)} but ${chalk__default["default"].blue(
++                pkgName
++              )} is not specified in the dependencies or peerDependencies of ${chalk__default["default"].blue(pkg.name)}. please add ${chalk__default[
++                "default"
++              ].blue(pkgName)} to the dependencies or peerDependencies of ${chalk__default["default"].blue(pkg.name)}`,
++              pkg.name
++            );
+           }
+         }
+       }
+@@ -1397,10 +1628,8 @@ const isFieldValid = {
+       return true;
+     } // JSON.stringify to make sure conditions are in proper order
+ 
+-
+     return JSON.stringify(pkg.json.exports) === JSON.stringify(generated);
+   }
+-
+ };
+ function isUmdNameSpecified(entrypoint) {
+   return typeof entrypoint.json.preconstruct.umdName === "string";
+@@ -1438,11 +1667,18 @@ function validateEntrypoint(entrypoint, log) {
+         projectsShownOldDistNamesInfo.add(entrypoint.package.project);
+         info(`it looks like you're using the dist filenames of Preconstruct v1, the default dist filename strategy has changed in v2`);
+         info(`you can run ${chalk__default["default"].green("preconstruct fix")} to use the new dist filenames`);
+-        info('if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "unscoped-package-name"` to the Preconstruct config in your root package.json');
++        info(
++          'if you want to keep the dist filename strategy of v1, add `"distFilenameStrategy": "unscoped-package-name"` to the Preconstruct config in your root package.json'
++        );
+       }
+ 
+-      fatalErrors.push( // they're both fixable but we don't want the message about running preconstruct fix if they're using the old dist file names since we have a custom message
+-      new (isUsingOldDistFilenames ? FatalError : FixableError)(errors$1.invalidField(field, entrypoint.json[field], validFieldsForEntrypoint[field](entrypoint)), entrypoint.name));
++      fatalErrors.push(
++        // they're both fixable but we don't want the message about running preconstruct fix if they're using the old dist file names since we have a custom message
++        new (isUsingOldDistFilenames ? FatalError : FixableError)(
++          errors$1.invalidField(field, entrypoint.json[field], validFieldsForEntrypoint[field](entrypoint)),
++          entrypoint.name
++        )
++      );
+     }
+ 
+     if (field === "umd:main" && !isUmdNameSpecified(entrypoint)) {
+@@ -1459,15 +1695,26 @@ function validateEntrypoint(entrypoint, log) {
+   }
+ }
+ 
+-const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set(["newEntrypoints", "newDistFilenames", "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild", "exports", "onlyEmitUsedTypeScriptDeclarations"]);
++const FORMER_FLAGS_THAT_ARE_ENABLED_NOW = new Set([
++  "newEntrypoints",
++  "newDistFilenames",
++  "newProcessEnvNodeEnvReplacementStrategyAndSkipTerserOnCJSProdBuild",
++  "exports",
++  "onlyEmitUsedTypeScriptDeclarations"
++]);
+ const EXPERIMENTAL_FLAGS = new Set(["logCompiledFiles", "keepDynamicImportAsDynamicImportInCommonJS", "importsConditions"]);
+ function validateProject(project, log = false) {
+   let errors = [];
+ 
+   if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+-    Object.keys(project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH).forEach(key => {
++    Object.keys(project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH).forEach((key) => {
+       if (FORMER_FLAGS_THAT_ARE_ENABLED_NOW.has(key)) {
+-        errors.push(new FixableError(`The behaviour from the experimental flag ${JSON.stringify(key)} is the current behaviour now, the flag should be removed`, project.name));
++        errors.push(
++          new FixableError(
++            `The behaviour from the experimental flag ${JSON.stringify(key)} is the current behaviour now, the flag should be removed`,
++            project.name
++          )
++        );
+       } else if (!EXPERIMENTAL_FLAGS.has(key)) {
+         errors.push(new FatalError(`The experimental flag ${JSON.stringify(key)} in your config does not exist`, project.name));
+       }
+@@ -1517,7 +1764,7 @@ async function validate(directory) {
+ }
+ 
+ async function doInit(pkg) {
+-  if (pkg.entrypoints.every(entrypoint => isFieldValid.main(entrypoint))) {
++  if (pkg.entrypoints.every((entrypoint) => isFieldValid.main(entrypoint))) {
+     info(infos.validField("main"), pkg.name);
+   } else {
+     let canWriteMainField = await confirms.writeMainField(pkg);
+@@ -1529,8 +1776,8 @@ async function doInit(pkg) {
+     pkg.setFieldOnEntrypoints("main");
+   }
+ 
+-  let allEntrypointsAreMissingAModuleField = pkg.entrypoints.every(entrypoint => entrypoint.json.module === undefined);
+-  let someEntrypointsAreNotValid = pkg.entrypoints.some(entrypoint => !isFieldValid.module(entrypoint));
++  let allEntrypointsAreMissingAModuleField = pkg.entrypoints.every((entrypoint) => entrypoint.json.module === undefined);
++  let someEntrypointsAreNotValid = pkg.entrypoints.some((entrypoint) => !isFieldValid.module(entrypoint));
+ 
+   if (allEntrypointsAreMissingAModuleField || someEntrypointsAreNotValid) {
+     let canWriteModuleField = await confirms.writeModuleField(pkg);
+@@ -1544,9 +1791,9 @@ async function doInit(pkg) {
+     info(infos.validField("module"), pkg.name);
+   }
+ 
+-  let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some(entrypoint => entrypoint.json["umd:main"] !== undefined);
+-  let someUmdMainFieldsAreInvalid = pkg.entrypoints.some(entrypoint => !isFieldValid["umd:main"](entrypoint));
+-  let someUmdNamesAreNotSpecified = pkg.entrypoints.some(entrypoint => !isUmdNameSpecified(entrypoint));
++  let someEntrypointsHaveAMaybeInvalidUmdBuild = pkg.entrypoints.some((entrypoint) => entrypoint.json["umd:main"] !== undefined);
++  let someUmdMainFieldsAreInvalid = pkg.entrypoints.some((entrypoint) => !isFieldValid["umd:main"](entrypoint));
++  let someUmdNamesAreNotSpecified = pkg.entrypoints.some((entrypoint) => !isUmdNameSpecified(entrypoint));
+ 
+   if (someEntrypointsHaveAMaybeInvalidUmdBuild && (someUmdMainFieldsAreInvalid || someUmdNamesAreNotSpecified)) {
+     let shouldWriteUMDBuilds = await confirms.fixUmdBuild(pkg);
+@@ -1563,8 +1810,8 @@ async function doInit(pkg) {
+     }
+   }
+ 
+-  let someEntrypointsHaveABrowserField = pkg.entrypoints.some(entrypoint => entrypoint.json.browser !== undefined);
+-  let someEntrypointsHaveAnInvalidBrowserField = pkg.entrypoints.some(entrypoint => !isFieldValid.browser(entrypoint));
++  let someEntrypointsHaveABrowserField = pkg.entrypoints.some((entrypoint) => entrypoint.json.browser !== undefined);
++  let someEntrypointsHaveAnInvalidBrowserField = pkg.entrypoints.some((entrypoint) => !isFieldValid.browser(entrypoint));
+ 
+   if (someEntrypointsHaveABrowserField && someEntrypointsHaveAnInvalidBrowserField) {
+     let shouldFixBrowserField = await confirms.fixBrowserField(pkg);
+@@ -1576,7 +1823,7 @@ async function doInit(pkg) {
+     }
+   }
+ 
+-  await Promise.all(pkg.entrypoints.map(x => x.save()));
++  await Promise.all(pkg.entrypoints.map((x) => x.save()));
+ }
+ 
+ async function init(directory) {
+@@ -1591,9 +1838,7 @@ function rewriteBabelRuntimeHelpers() {
+   return {
+     name: "rewrite-babel-runtime-helpers",
+ 
+-    renderChunk(code, chunkInfo, {
+-      format
+-    }) {
++    renderChunk(code, chunkInfo, { format }) {
+       if (format === "es") {
+         return code.replace(pattern, (_, quote, maybeCorejsBit, path) => {
+           return `from ${quote}@babel/runtime${maybeCorejsBit}/helpers/esm/${path}${quote}`;
+@@ -1608,7 +1853,6 @@ function rewriteBabelRuntimeHelpers() {
+ 
+       return null;
+     }
+-
+   };
+ }
+ 
+@@ -1616,16 +1860,18 @@ function getModuleSpecifier(node, typescript) {
+   // import/export { x } from "x"
+   const isImportDeclaration = typescript.isImportDeclaration(node);
+ 
+-  if ((isImportDeclaration || typescript.isExportDeclaration(node)) && node.moduleSpecifier !== undefined && typescript.isStringLiteral(node.moduleSpecifier)) {
++  if (
++    (isImportDeclaration || typescript.isExportDeclaration(node)) &&
++    node.moduleSpecifier !== undefined &&
++    typescript.isStringLiteral(node.moduleSpecifier)
++  ) {
+     return node.moduleSpecifier;
+   } // type x = import('a').Blah
+ 
+-
+   if (typescript.isImportTypeNode(node) && typescript.isLiteralTypeNode(node.argument) && typescript.isStringLiteral(node.argument.literal)) {
+     return node.argument.literal;
+   } // import x = require("x")
+ 
+-
+   if (typescript.isExternalModuleReference(node) && typescript.isStringLiteral(node.expression)) {
+     return node.expression;
+   }
+@@ -1633,7 +1879,7 @@ function getModuleSpecifier(node, typescript) {
+ 
+ function getDiagnosticsHost(ts, projectDir) {
+   return {
+-    getCanonicalFileName: x => ts.sys.useCaseSensitiveFileNames ? x : x.toLowerCase(),
++    getCanonicalFileName: (x) => (ts.sys.useCaseSensitiveFileNames ? x : x.toLowerCase()),
+     getCurrentDirectory: () => projectDir,
+     getNewLine: () => os.EOL
+   };
+@@ -1649,7 +1895,10 @@ function loadTypeScript(packageDir, projectDir, pkgName) {
+         // (note this will only happen with PnP)
+         return require(resolveFrom__default["default"](projectDir, "typescript"));
+       } catch (err) {
+-        throw new FatalError("an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.", pkgName);
++        throw new FatalError(
++          "an entrypoint source file ends with the .ts or .tsx extension but the typescript module could not be resolved from the project directory, please install it.",
++          pkgName
++        );
+       }
+     }
+ 
+@@ -1659,7 +1908,7 @@ function loadTypeScript(packageDir, projectDir, pkgName) {
+ 
+ function weakMemoize(func) {
+   let cache = new WeakMap();
+-  return arg => {
++  return (arg) => {
+     if (cache.has(arg)) {
+       return cache.get(arg);
+     }
+@@ -1672,7 +1921,7 @@ function weakMemoize(func) {
+ 
+ function memoize(fn) {
+   const cache = new Map();
+-  return arg => {
++  return (arg) => {
+     if (!cache.has(arg)) cache.set(arg, fn(arg));
+     return cache.get(arg);
+   };
+@@ -1694,9 +1943,11 @@ async function nonMemoizedGetProgram(typescript, configFileName) {
+   };
+ }
+ 
+-let memoizedGetProgram = weakMemoize(typescript => memoize(async configFileName => {
+-  return nonMemoizedGetProgram(typescript, configFileName);
+-}));
++let memoizedGetProgram = weakMemoize((typescript) =>
++  memoize(async (configFileName) => {
++    return nonMemoizedGetProgram(typescript, configFileName);
++  })
++);
+ async function getProgram(dirname, pkgName, ts) {
+   let configFileName = ts.findConfigFile(dirname, ts.sys.fileExists);
+ 
+@@ -1708,13 +1959,22 @@ async function getProgram(dirname, pkgName, ts) {
+   // if the tsconfig _isn't_ in the package directory though, it's probably fine to memoize it
+   // since it should just be a root level tsconfig
+ 
+-
+-  return normalizePath__default["default"](configFileName) === normalizePath__default["default"](path__namespace["default"].join(dirname, "tsconfig.json")) ? nonMemoizedGetProgram(ts, configFileName) : memoizedGetProgram(ts)(configFileName);
++  return normalizePath__default["default"](configFileName) ===
++    normalizePath__default["default"](path__namespace["default"].join(dirname, "tsconfig.json"))
++    ? nonMemoizedGetProgram(ts, configFileName)
++    : memoizedGetProgram(ts)(configFileName);
+ }
+-function getDeclarationsForFile(filename, typescript, program, normalizedPkgDir, projectDir, diagnosticsHost,
+-/** This will only be called once per unique module specifier in a file */
+-visitModuleSpecifier) {
+-  const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier !== null && visitModuleSpecifier !== void 0 ? visitModuleSpecifier : x => x);
++function getDeclarationsForFile(
++  filename,
++  typescript,
++  program,
++  normalizedPkgDir,
++  projectDir,
++  diagnosticsHost,
++  /** This will only be called once per unique module specifier in a file */
++  visitModuleSpecifier
++) {
++  const cachedVisitModuleSpecifier = memoize(visitModuleSpecifier !== null && visitModuleSpecifier !== void 0 ? visitModuleSpecifier : (x) => x);
+   const sourceFile = program.getSourceFile(typescript.sys.useCaseSensitiveFileNames ? filename : filename.toLowerCase());
+ 
+   if (!sourceFile) {
+@@ -1727,7 +1987,7 @@ visitModuleSpecifier) {
+     if (visitModuleSpecifier) {
+       const magicString = new MagicString__default["default"](content);
+ 
+-      const visitor = node => {
++      const visitor = (node) => {
+         const moduleSpecifier = getModuleSpecifier(node, typescript);
+ 
+         if (moduleSpecifier) {
+@@ -1747,7 +2007,10 @@ visitModuleSpecifier) {
+ 
+     return {
+       types: {
+-        name: filename.replace(normalizedPkgDir, normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))),
++        name: filename.replace(
++          normalizedPkgDir,
++          normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))
++        ),
+         content
+       },
+       filename
+@@ -1756,57 +2019,80 @@ visitModuleSpecifier) {
+ 
+   const emitted = {};
+   const otherEmitted = [];
+-  const {
+-    diagnostics
+-  } = program.emit(sourceFile, (name, text) => {
+-    if (name.endsWith(".d.ts")) {
+-      emitted.types = {
+-        name: name.replace(normalizedPkgDir, normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))),
+-        content: text
+-      };
+-    } else if (name.endsWith(".d.ts.map")) {
+-      emitted.map = {
+-        name: name.replace(normalizedPkgDir, normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))),
+-        content: text
+-      };
+-    } else {
+-      otherEmitted.push({
+-        name,
+-        text
+-      });
+-    }
+-  }, undefined, true, {
+-    afterDeclarations: [context => node => {
+-      if (!visitModuleSpecifier) {
+-        return node;
++  const { diagnostics } = program.emit(
++    sourceFile,
++    (name, text) => {
++      if (name.endsWith(".d.ts")) {
++        emitted.types = {
++          name: name.replace(
++            normalizedPkgDir,
++            normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))
++          ),
++          content: text
++        };
++      } else if (name.endsWith(".d.ts.map")) {
++        emitted.map = {
++          name: name.replace(
++            normalizedPkgDir,
++            normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "dist", "declarations"))
++          ),
++          content: text
++        };
++      } else {
++        otherEmitted.push({
++          name,
++          text
++        });
+       }
++    },
++    undefined,
++    true,
++    {
++      afterDeclarations: [
++        (context) => (node) => {
++          if (!visitModuleSpecifier) {
++            return node;
++          }
+ 
+-      const replacedNodes = new Map();
++          const replacedNodes = new Map();
+ 
+-      const visitor = node => {
+-        if (typescript.isStringLiteral(node) && replacedNodes.has(node)) {
+-          return replacedNodes.get(node);
+-        }
++          const visitor = (node) => {
++            if (typescript.isStringLiteral(node) && replacedNodes.has(node)) {
++              return replacedNodes.get(node);
++            }
+ 
+-        const literal = getModuleSpecifier(node, typescript);
++            const literal = getModuleSpecifier(node, typescript);
+ 
+-        if (literal) {
+-          const replaced = cachedVisitModuleSpecifier(literal.text);
++            if (literal) {
++              const replaced = cachedVisitModuleSpecifier(literal.text);
+ 
+-          if (replaced !== literal.text) {
+-            replacedNodes.set(literal, typescript.factory.createStringLiteral(replaced));
+-          }
+-        }
++              if (replaced !== literal.text) {
++                replacedNodes.set(literal, typescript.factory.createStringLiteral(replaced));
++              }
++            }
+ 
+-        return typescript.visitEachChild(node, visitor, context);
+-      };
++            return typescript.visitEachChild(node, visitor, context);
++          };
+ 
+-      return typescript.visitEachChild(node, visitor, context);
+-    }]
+-  });
++          return typescript.visitEachChild(node, visitor, context);
++        }
++      ]
++    }
++  );
+ 
+   if (!emitted.types || diagnostics.length) {
+-    throw new FatalError(`Generating TypeScript declarations for ${normalizePath__default["default"](path__namespace["default"].relative(projectDir, filename))} failed:\n${typescript.formatDiagnosticsWithColorAndContext(diagnostics, diagnosticsHost)}${otherEmitted.length ? `\n\nTypeScript emitted other files when attempting to emit .d.ts files:\n${otherEmitted.map(x => `${x.name}\n\n${x.text}`).join("\n\n")}` : ""}`, "");
++    throw new FatalError(
++      `Generating TypeScript declarations for ${normalizePath__default["default"](
++        path__namespace["default"].relative(projectDir, filename)
++      )} failed:\n${typescript.formatDiagnosticsWithColorAndContext(diagnostics, diagnosticsHost)}${
++        otherEmitted.length
++          ? `\n\nTypeScript emitted other files when attempting to emit .d.ts files:\n${otherEmitted
++              .map((x) => `${x.name}\n\n${x.text}`)
++              .join("\n\n")}`
++          : ""
++      }`,
++      ""
++    );
+   }
+ 
+   return {
+@@ -1829,22 +2115,37 @@ function replaceExt(filename) {
+   });
+ }
+ 
+-function getDeclarationsWithImportedModuleSpecifiersReplacing(typescript, program, normalizedPkgDir, projectDir, resolveModuleName, resolvedEntrypointSources) {
++function getDeclarationsWithImportedModuleSpecifiersReplacing(
++  typescript,
++  program,
++  normalizedPkgDir,
++  projectDir,
++  resolveModuleName,
++  resolvedEntrypointSources
++) {
+   const depQueue = new Set(resolvedEntrypointSources);
+   const diagnosticsHost = getDiagnosticsHost(typescript, projectDir);
+   const normalizedPkgDirNodeModules = normalizePath__default["default"](path__namespace["default"].join(normalizedPkgDir, "node_modules"));
+   const emitted = [];
+ 
+   for (const filename of depQueue) {
+-    const handleImport = imported => {
++    const handleImport = (imported) => {
+       const resolvedModule = resolveModuleName(imported, filename);
+ 
+-      if (!resolvedModule || !resolvedModule.resolvedFileName.startsWith(normalizedPkgDir) || resolvedModule.resolvedFileName.startsWith(normalizedPkgDirNodeModules)) {
++      if (
++        !resolvedModule ||
++        !resolvedModule.resolvedFileName.startsWith(normalizedPkgDir) ||
++        resolvedModule.resolvedFileName.startsWith(normalizedPkgDirNodeModules)
++      ) {
+         return imported;
+       }
+ 
+       depQueue.add(resolvedModule.resolvedFileName);
+-      let forImport = replaceExt(normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(filename), resolvedModule.resolvedFileName)));
++      let forImport = replaceExt(
++        normalizePath__default["default"](
++          path__namespace["default"].relative(path__namespace["default"].dirname(filename), resolvedModule.resolvedFileName)
++        )
++      );
+ 
+       if (!forImport.startsWith("../")) {
+         forImport = `./${forImport}`;
+@@ -1860,7 +2161,7 @@ function getDeclarationsWithImportedModuleSpecifiersReplacing(typescript, progra
+   return emitted;
+ }
+ 
+-let isTsPath = source => /\.tsx?/.test(source);
++let isTsPath = (source) => /\.tsx?/.test(source);
+ function typescriptDeclarations(pkg) {
+   return {
+     name: "typescript-declarations",
+@@ -1870,24 +2171,24 @@ function typescriptDeclarations(pkg) {
+       // so that we can avoid some extra fs operations if there is say some .ts entrypoints
+       // and some .js entrypoints with a .d.ts
+ 
+-      if (!pkg.entrypoints.some(({
+-        source
+-      }) => isTsPath(source))) {
+-        const hasSomeDtsEntrypoints = (await Promise.all(pkg.entrypoints.map(async ({
+-          source
+-        }) => {
+-          try {
+-            await fs__namespace["default"].stat(source.replace(/\.jsx?/, ".d.ts"));
+-          } catch (err) {
+-            if (err.code === "ENOENT") {
+-              return false;
+-            }
++      if (!pkg.entrypoints.some(({ source }) => isTsPath(source))) {
++        const hasSomeDtsEntrypoints = (
++          await Promise.all(
++            pkg.entrypoints.map(async ({ source }) => {
++              try {
++                await fs__namespace["default"].stat(source.replace(/\.jsx?/, ".d.ts"));
++              } catch (err) {
++                if (err.code === "ENOENT") {
++                  return false;
++                }
+ 
+-            throw err;
+-          }
++                throw err;
++              }
+ 
+-          return true;
+-        }))).some(hasDtsForEntrypoint => hasDtsForEntrypoint);
++              return true;
++            })
++          )
++        ).some((hasDtsForEntrypoint) => hasDtsForEntrypoint);
+ 
+         if (!hasSomeDtsEntrypoints) {
+           return;
+@@ -1895,50 +2196,66 @@ function typescriptDeclarations(pkg) {
+       }
+ 
+       const typescript = loadTypeScript(pkg.directory, pkg.project.directory, pkg.name);
+-      const {
+-        program,
+-        options
+-      } = await getProgram(pkg.directory, pkg.name, typescript);
++      const { program, options } = await getProgram(pkg.directory, pkg.name, typescript);
+       let normalizedDirname = normalizePath__default["default"](pkg.directory);
+-      let moduleResolutionCache = typescript.createModuleResolutionCache(normalizedDirname, x => x, options);
++      let moduleResolutionCache = typescript.createModuleResolutionCache(normalizedDirname, (x) => x, options);
+ 
+       const resolveModule = (moduleName, containingFile) => {
+-        let {
+-          resolvedModule
+-        } = typescript.resolveModuleName(moduleName, containingFile, options, typescript.sys, moduleResolutionCache);
++        let { resolvedModule } = typescript.resolveModuleName(moduleName, containingFile, options, typescript.sys, moduleResolutionCache);
+         return resolvedModule;
+       };
+ 
+-      const entrypointSourceToTypeScriptSource = new Map(pkg.entrypoints.map(entrypoint => {
+-        const x = entrypoint.source;
+-        let resolvedModule = resolveModule(path__namespace["default"].join(path__namespace["default"].dirname(x), path__namespace["default"].basename(x, path__namespace["default"].extname(x))), pkg.directory);
+-
+-        if (!resolvedModule) {
+-          throw new Error("This is an internal error, please open an issue if you see this: ts could not resolve module");
+-        }
++      const entrypointSourceToTypeScriptSource = new Map(
++        pkg.entrypoints.map((entrypoint) => {
++          const x = entrypoint.source;
++          let resolvedModule = resolveModule(
++            path__namespace["default"].join(
++              path__namespace["default"].dirname(x),
++              path__namespace["default"].basename(x, path__namespace["default"].extname(x))
++            ),
++            pkg.directory
++          );
++
++          if (!resolvedModule) {
++            throw new Error("This is an internal error, please open an issue if you see this: ts could not resolve module");
++          }
+ 
+-        return [normalizePath__default["default"](x), resolvedModule.resolvedFileName];
+-      }));
+-      const declarations = getDeclarationsWithImportedModuleSpecifiersReplacing(typescript, program, normalizedDirname, pkg.project.directory, resolveModule, [...entrypointSourceToTypeScriptSource.values()]);
++          return [normalizePath__default["default"](x), resolvedModule.resolvedFileName];
++        })
++      );
++      const declarations = getDeclarationsWithImportedModuleSpecifiersReplacing(
++        typescript,
++        program,
++        normalizedDirname,
++        pkg.project.directory,
++        resolveModule,
++        [...entrypointSourceToTypeScriptSource.values()]
++      );
+       let srcFilenameToDtsFilenameMap = new Map();
+-      await Promise.all([...declarations].map(async output => {
+-        srcFilenameToDtsFilenameMap.set(normalizePath__default["default"](output.filename), output.types.name);
+-        this.emitFile({
+-          type: "asset",
+-          fileName: path__namespace["default"].relative(opts.dir, output.types.name),
+-          source: output.types.content
+-        });
+-
+-        if (output.map) {
+-          const sourceRoot = normalizePath__default["default"](path__namespace["default"].dirname(path__namespace["default"].relative(path__namespace["default"].dirname(output.map.name), output.filename)));
+-          const source = overwriteDeclarationMapSourceRoot(output.map.content, sourceRoot);
++      await Promise.all(
++        [...declarations].map(async (output) => {
++          srcFilenameToDtsFilenameMap.set(normalizePath__default["default"](output.filename), output.types.name);
+           this.emitFile({
+             type: "asset",
+-            fileName: path__namespace["default"].relative(opts.dir, output.map.name),
+-            source
++            fileName: path__namespace["default"].relative(opts.dir, output.types.name),
++            source: output.types.content
+           });
+-        }
+-      }));
++
++          if (output.map) {
++            const sourceRoot = normalizePath__default["default"](
++              path__namespace["default"].dirname(
++                path__namespace["default"].relative(path__namespace["default"].dirname(output.map.name), output.filename)
++              )
++            );
++            const source = overwriteDeclarationMapSourceRoot(output.map.content, sourceRoot);
++            this.emitFile({
++              type: "asset",
++              fileName: path__namespace["default"].relative(opts.dir, output.map.name),
++              source
++            });
++          }
++        })
++      );
+ 
+       for (const n in bundle) {
+         var _pkg$exportsFieldConf;
+@@ -1965,7 +2282,12 @@ function typescriptDeclarations(pkg) {
+         }
+ 
+         let mainFieldPath = file.fileName.replace(/(?:\.prod)?\.js$/, "");
+-        let relativeToSource = normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(path__namespace["default"].join(opts.dir, file.fileName)), dtsFilename.replace(/\.d\.ts$/, "")));
++        let relativeToSource = normalizePath__default["default"](
++          path__namespace["default"].relative(
++            path__namespace["default"].dirname(path__namespace["default"].join(opts.dir, file.fileName)),
++            dtsFilename.replace(/\.d\.ts$/, "")
++          )
++        );
+ 
+         if (!relativeToSource.startsWith(".")) {
+           relativeToSource = `./${relativeToSource}`;
+@@ -1988,7 +2310,11 @@ function typescriptDeclarations(pkg) {
+           source: tsReexportDeclMap(baseDtsFilename, `${relativeToSource}.d.ts`)
+         });
+ 
+-        if (((_pkg$exportsFieldConf = pkg.exportsFieldConfig()) === null || _pkg$exportsFieldConf === void 0 ? void 0 : _pkg$exportsFieldConf.importConditionDefaultExport) === "default") {
++        if (
++          ((_pkg$exportsFieldConf = pkg.exportsFieldConfig()) === null || _pkg$exportsFieldConf === void 0
++            ? void 0
++            : _pkg$exportsFieldConf.importConditionDefaultExport) === "default"
++        ) {
+           const dmtsFilename = dtsFileName.replace(/\.d\.ts$/, ".d.mts");
+           const basedmtsFilename = baseDtsFilename.replace(/\.d\.ts$/, ".d.mts");
+           const sourceWithExtension = `${relativeToSource}.js`;
+@@ -2014,7 +2340,6 @@ function typescriptDeclarations(pkg) {
+         }
+       }
+     }
+-
+   };
+ }
+ 
+@@ -2036,7 +2361,6 @@ async function hasDtsFile(entrypoint) {
+ // but we don't handle that correctly for builds right now anyway and i don't think people are
+ // really doing type-only default exports so i'm not worrying about it right now
+ 
+-
+ async function entrypointHasDefaultExport(entrypoint, content) {
+   // this regex won't tell us that a module definitely has a default export
+   // if it doesn't match though, it will tell us that the module
+@@ -2056,7 +2380,16 @@ async function entrypointHasDefaultExport(entrypoint, content) {
+   });
+ 
+   for (let statement of ast.program.body) {
+-    if (statement.type === "ExportDefaultDeclaration" || statement.type === "ExportNamedDeclaration" && statement.specifiers.some(specifier => (specifier.type === "ExportDefaultSpecifier" || specifier.type === "ExportNamespaceSpecifier" || specifier.type === "ExportSpecifier") && specifier.exported.type === "Identifier" && specifier.exported.name === "default")) {
++    if (
++      statement.type === "ExportDefaultDeclaration" ||
++      (statement.type === "ExportNamedDeclaration" &&
++        statement.specifiers.some(
++          (specifier) =>
++            (specifier.type === "ExportDefaultSpecifier" || specifier.type === "ExportNamespaceSpecifier" || specifier.type === "ExportSpecifier") &&
++            specifier.exported.type === "Identifier" &&
++            specifier.exported.name === "default"
++        ))
++    ) {
+       return true;
+     }
+   }
+@@ -2066,13 +2399,26 @@ async function entrypointHasDefaultExport(entrypoint, content) {
+ async function writeDevTSFiles(entrypoint, hasDefaultExport) {
+   var _entrypoint$package$e;
+ 
+-  const dtsReexportFilename = path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint)).replace(/\.js$/, ".d.ts");
++  const dtsReexportFilename = path__namespace["default"]
++    .join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint))
++    .replace(/\.js$/, ".d.ts");
+   const baseDtsFilename = path__namespace["default"].basename(dtsReexportFilename);
+-  const relativePathWithExtension = normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(dtsReexportFilename), entrypoint.source));
+-  let promises = [fs__namespace.outputFile(dtsReexportFilename, dtsTemplate(baseDtsFilename, hasDefaultExport, relativePathWithExtension.replace(/\.tsx?$/, ""))), fs__namespace.outputFile(dtsReexportFilename + ".map", tsReexportDeclMap(baseDtsFilename, relativePathWithExtension))];
+-
+-  if (((_entrypoint$package$e = entrypoint.package.exportsFieldConfig()) === null || _entrypoint$package$e === void 0 ? void 0 : _entrypoint$package$e.importConditionDefaultExport) === "default") {
+-    const dmtsReexportFilename = path__namespace["default"].join(entrypoint.package.directory, getExportsImportUnwrappingDefaultOutputPath(entrypoint)).replace(/\.mjs$/, ".d.mts");
++  const relativePathWithExtension = normalizePath__default["default"](
++    path__namespace["default"].relative(path__namespace["default"].dirname(dtsReexportFilename), entrypoint.source)
++  );
++  let promises = [
++    fs__namespace.outputFile(dtsReexportFilename, dtsTemplate(baseDtsFilename, hasDefaultExport, relativePathWithExtension.replace(/\.tsx?$/, ""))),
++    fs__namespace.outputFile(dtsReexportFilename + ".map", tsReexportDeclMap(baseDtsFilename, relativePathWithExtension))
++  ];
++
++  if (
++    ((_entrypoint$package$e = entrypoint.package.exportsFieldConfig()) === null || _entrypoint$package$e === void 0
++      ? void 0
++      : _entrypoint$package$e.importConditionDefaultExport) === "default"
++  ) {
++    const dmtsReexportFilename = path__namespace["default"]
++      .join(entrypoint.package.directory, getExportsImportUnwrappingDefaultOutputPath(entrypoint))
++      .replace(/\.mjs$/, ".d.mts");
+     const baseDmtsFilename = path__namespace["default"].basename(dmtsReexportFilename);
+     const ext = path__namespace["default"].extname(relativePathWithExtension).slice(1);
+     const mappedExt = {
+@@ -2082,7 +2428,10 @@ async function writeDevTSFiles(entrypoint, hasDefaultExport) {
+       cts: "cjs"
+     }[ext];
+     const pathToImport = relativePathWithExtension.replace(new RegExp(`\\.${ext}$`), `.${mappedExt}`);
+-    promises.push(fs__namespace.outputFile(dmtsReexportFilename, dmtsTemplate(baseDmtsFilename, hasDefaultExport, pathToImport)), fs__namespace.outputFile(dmtsReexportFilename + ".map", tsReexportDeclMap(baseDmtsFilename, relativePathWithExtension)));
++    promises.push(
++      fs__namespace.outputFile(dmtsReexportFilename, dmtsTemplate(baseDmtsFilename, hasDefaultExport, pathToImport)),
++      fs__namespace.outputFile(dmtsReexportFilename + ".map", tsReexportDeclMap(baseDmtsFilename, relativePathWithExtension))
++    );
+ 
+     if (hasDefaultExport) {
+       promises.push(fs__namespace.outputFile(getDtsDefaultForMtsFilepath(dmtsReexportFilename), dtsDefaultForDmtsTemplate(pathToImport)));
+@@ -2106,96 +2455,162 @@ async function writeDevFlowFile(entrypoint) {
+   // and then everything is fine but if a production build is broken
+   // a consumer would have to do a new release and that's not ideal
+   let cjsDistPath = path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint));
+-  await fs__namespace.writeFile(cjsDistPath + ".flow", flowTemplate(false, normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(cjsDistPath), entrypoint.source))));
++  await fs__namespace.writeFile(
++    cjsDistPath + ".flow",
++    flowTemplate(
++      false,
++      normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(cjsDistPath), entrypoint.source))
++    )
++  );
+ }
+ 
+ async function dev(projectDir) {
+   let project = await Project.create(projectDir);
+   validateProject(project);
+   info("project is valid!");
+-  await Promise.all(project.packages.map(pkg => {
+-    const exportsFieldConfig = pkg.exportsFieldConfig();
+-    return Promise.all(pkg.entrypoints.map(async entrypoint => {
+-      let hasDefaultExportPromise;
+-      const contentsPromise = fs__namespace.readFile(entrypoint.source, "utf8");
+-
+-      const getHasDefaultExportPromise = () => {
+-        if (hasDefaultExportPromise === undefined) {
+-          hasDefaultExportPromise = contentsPromise.then(content => entrypointHasDefaultExport(entrypoint, content));
+-        }
+-
+-        return hasDefaultExportPromise;
+-      };
++  await Promise.all(
++    project.packages.map((pkg) => {
++      const exportsFieldConfig = pkg.exportsFieldConfig();
++      return Promise.all(
++        pkg.entrypoints.map(async (entrypoint) => {
++          let hasDefaultExportPromise;
++          const contentsPromise = fs__namespace.readFile(entrypoint.source, "utf8");
++
++          const getHasDefaultExportPromise = () => {
++            if (hasDefaultExportPromise === undefined) {
++              hasDefaultExportPromise = contentsPromise.then((content) => entrypointHasDefaultExport(entrypoint, content));
++            }
+ 
+-      await cleanEntrypoint(entrypoint);
+-      let entrypointPromises = [(async () => {
+-        if ((await contentsPromise).includes("@flow")) {
+-          await writeDevFlowFile(entrypoint);
+-        }
+-      })(), (async () => {
+-        if (tsExtensionPattern.test(entrypoint.source) || (await hasDtsFile(entrypoint))) {
+-          await writeDevTSFiles(entrypoint, (await getHasDefaultExportPromise()));
+-        }
+-      })()];
+-      const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
+-
+-      if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "imports") {
+-        for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+-          entrypointPromises.push(fs__namespace.symlink(entrypoint.source, path__namespace["default"].join(entrypoint.directory, getDistFilenameForConditions(entrypoint, conditions.concat("module")))), fs__namespace.writeFile(path__namespace["default"].join(entrypoint.directory, getDistFilenameForConditions(entrypoint, conditions)), cjsTemplate));
+-
+-          if (exportsFieldConfig.importConditionDefaultExport === "default") {
+-            entrypointPromises.push(getHasDefaultExportPromise().then(hasDefaultExport => {
+-              const filepath = path__namespace["default"].join(entrypoint.package.directory, getDistFilenameForConditions(entrypoint, conditions).replace(/\.js$/, ".mjs"));
+-              const importPath = `./${getDistFilenameForConditions(entrypoint, conditions)}`;
+-              return Promise.all([fs__namespace.writeFile(filepath, mjsTemplate( // the * won't really do anything right now
+-              // since cjs-module-lexer won't find anything
+-              // but that could be fixed by adding fake things
+-              // to the .cjs.js file that look like exports to cjs-module-lexer
+-              // but don't actually add the exports at runtime like esbuild does
+-              // (it would require re-running dev when adding new named exports)
+-              hasDefaultExport ? ["default", "*other"] : ["*other"], importPath, filepath)), hasDefaultExport && fs__namespace.writeFile(getJsDefaultForMjsFilepath(filepath), jsDefaultForMjsTemplate(importPath))]);
+-            }));
+-          }
+-        }
++            return hasDefaultExportPromise;
++          };
+ 
+-        return Promise.all(entrypointPromises);
+-      }
++          await cleanEntrypoint(entrypoint);
++          let entrypointPromises = [
++            (async () => {
++              if ((await contentsPromise).includes("@flow")) {
++                await writeDevFlowFile(entrypoint);
++              }
++            })(),
++            (async () => {
++              if (tsExtensionPattern.test(entrypoint.source) || (await hasDtsFile(entrypoint))) {
++                await writeDevTSFiles(entrypoint, await getHasDefaultExportPromise());
++              }
++            })()
++          ];
++          const cjsTemplate = commonjsRequireHookTemplate(entrypoint);
++
++          if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "imports") {
++            for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
++              entrypointPromises.push(
++                fs__namespace.symlink(
++                  entrypoint.source,
++                  path__namespace["default"].join(entrypoint.directory, getDistFilenameForConditions(entrypoint, conditions.concat("module")))
++                ),
++                fs__namespace.writeFile(
++                  path__namespace["default"].join(entrypoint.directory, getDistFilenameForConditions(entrypoint, conditions)),
++                  cjsTemplate
++                )
++              );
++
++              if (exportsFieldConfig.importConditionDefaultExport === "default") {
++                entrypointPromises.push(
++                  getHasDefaultExportPromise().then((hasDefaultExport) => {
++                    const filepath = path__namespace["default"].join(
++                      entrypoint.package.directory,
++                      getDistFilenameForConditions(entrypoint, conditions).replace(/\.js$/, ".mjs")
++                    );
++                    const importPath = `./${getDistFilenameForConditions(entrypoint, conditions)}`;
++                    return Promise.all([
++                      fs__namespace.writeFile(
++                        filepath,
++                        mjsTemplate(
++                          // the * won't really do anything right now
++                          // since cjs-module-lexer won't find anything
++                          // but that could be fixed by adding fake things
++                          // to the .cjs.js file that look like exports to cjs-module-lexer
++                          // but don't actually add the exports at runtime like esbuild does
++                          // (it would require re-running dev when adding new named exports)
++                          hasDefaultExport ? ["default", "*other"] : ["*other"],
++                          importPath,
++                          filepath
++                        )
++                      ),
++                      hasDefaultExport && fs__namespace.writeFile(getJsDefaultForMjsFilepath(filepath), jsDefaultForMjsTemplate(importPath))
++                    ]);
++                  })
++                );
++              }
++            }
+ 
+-      entrypointPromises.push(fs__namespace.writeFile(path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint)), cjsTemplate));
++            return Promise.all(entrypointPromises);
++          }
+ 
+-      if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.importConditionDefaultExport) === "default") {
+-        entrypointPromises.push(getHasDefaultExportPromise().then(hasDefaultExport => {
+-          const filepath = path__namespace["default"].join(entrypoint.package.directory, getExportsImportUnwrappingDefaultOutputPath(entrypoint));
+-          const importPath = `./${getBaseDistFilename(entrypoint, "cjs")}`;
+-          return Promise.all([fs__namespace.writeFile(filepath, mjsTemplate( // the * won't really do anything right now
+-          // since cjs-module-lexer won't find anything
+-          // but that could be fixed by adding fake things
+-          // to the .cjs.js file that look like exports to cjs-module-lexer
+-          // but don't actually add the exports at runtime like esbuild does
+-          // (it would require re-running dev when adding new named exports)
+-          hasDefaultExport ? ["default", "*other"] : ["*other"], importPath, filepath)), hasDefaultExport ? fs__namespace.writeFile(getJsDefaultForMjsFilepath(filepath), jsDefaultForMjsTemplate(importPath)) : undefined]);
+-        }));
+-      }
++          entrypointPromises.push(
++            fs__namespace.writeFile(path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.main(entrypoint)), cjsTemplate)
++          );
++
++          if (
++            (exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.importConditionDefaultExport) === "default"
++          ) {
++            entrypointPromises.push(
++              getHasDefaultExportPromise().then((hasDefaultExport) => {
++                const filepath = path__namespace["default"].join(
++                  entrypoint.package.directory,
++                  getExportsImportUnwrappingDefaultOutputPath(entrypoint)
++                );
++                const importPath = `./${getBaseDistFilename(entrypoint, "cjs")}`;
++                return Promise.all([
++                  fs__namespace.writeFile(
++                    filepath,
++                    mjsTemplate(
++                      // the * won't really do anything right now
++                      // since cjs-module-lexer won't find anything
++                      // but that could be fixed by adding fake things
++                      // to the .cjs.js file that look like exports to cjs-module-lexer
++                      // but don't actually add the exports at runtime like esbuild does
++                      // (it would require re-running dev when adding new named exports)
++                      hasDefaultExport ? ["default", "*other"] : ["*other"],
++                      importPath,
++                      filepath
++                    )
++                  ),
++                  hasDefaultExport ? fs__namespace.writeFile(getJsDefaultForMjsFilepath(filepath), jsDefaultForMjsTemplate(importPath)) : undefined
++                ]);
++              })
++            );
++          }
+ 
+-      if (entrypoint.json.module) {
+-        entrypointPromises.push(fs__namespace.symlink(entrypoint.source, path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.module(entrypoint))));
+-      }
++          if (entrypoint.json.module) {
++            entrypointPromises.push(
++              fs__namespace.symlink(
++                entrypoint.source,
++                path__namespace["default"].join(entrypoint.directory, validFieldsForEntrypoint.module(entrypoint))
++              )
++            );
++          }
+ 
+-      if (exportsFieldConfig !== null && exportsFieldConfig !== void 0 && exportsFieldConfig.conditions.envs.has("worker")) {
+-        entrypointPromises.push(fs__namespace.symlink(entrypoint.source, path__namespace["default"].join(pkg.directory, getExportsFieldOutputPath(entrypoint, "worker"))));
+-      }
++          if (exportsFieldConfig !== null && exportsFieldConfig !== void 0 && exportsFieldConfig.conditions.envs.has("worker")) {
++            entrypointPromises.push(
++              fs__namespace.symlink(
++                entrypoint.source,
++                path__namespace["default"].join(pkg.directory, getExportsFieldOutputPath(entrypoint, "worker"))
++              )
++            );
++          }
+ 
+-      if (entrypoint.json.browser) {
+-        let browserField = validFieldsForEntrypoint.browser(entrypoint);
++          if (entrypoint.json.browser) {
++            let browserField = validFieldsForEntrypoint.browser(entrypoint);
+ 
+-        for (let output of Object.values(browserField)) {
+-          entrypointPromises.push(fs__namespace.symlink(entrypoint.source, path__namespace["default"].join(entrypoint.directory, output)));
+-        }
+-      }
++            for (let output of Object.values(browserField)) {
++              entrypointPromises.push(fs__namespace.symlink(entrypoint.source, path__namespace["default"].join(entrypoint.directory, output)));
++            }
++          }
+ 
+-      return Promise.all(entrypointPromises);
+-    }));
+-  }));
++          return Promise.all(entrypointPromises);
++        })
++      );
++    })
++  );
+   success("created links!");
+ }
+ 
+@@ -2218,7 +2633,13 @@ function commonjsRequireHookTemplate(entrypoint) {
+ // but you can still require this module and it'll be compiled
+ 
+ // this bit of code imports the require hook and registers it
+-let unregister = require(${JSON.stringify(normalizePath__default["default"](path__namespace["default"].relative(distDirectory, path__namespace["default"].dirname(require.resolve("@preconstruct/hook")))))}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(normalizePath__default["default"](path__namespace["default"].relative(distDirectory, entrypoint.package.project.directory)))}, ${JSON.stringify(normalizePath__default["default"](path__namespace["default"].relative(distDirectory, entrypoint.package.directory)))});
++let unregister = require(${JSON.stringify(
++    normalizePath__default["default"](
++      path__namespace["default"].relative(distDirectory, path__namespace["default"].dirname(require.resolve("@preconstruct/hook")))
++    )
++  )}).___internalHook(typeof __dirname === 'undefined' ? undefined : __dirname, ${JSON.stringify(
++    normalizePath__default["default"](path__namespace["default"].relative(distDirectory, entrypoint.package.project.directory))
++  )}, ${JSON.stringify(normalizePath__default["default"](path__namespace["default"].relative(distDirectory, entrypoint.package.directory)))});
+ 
+ // this re-exports the source file
+ module.exports = require(${JSON.stringify(entrypointPath)});
+@@ -2244,17 +2665,26 @@ function getProdPath(cjsPath) {
+   return cjsPath.replace(/\.js$/, ".prod.js");
+ }
+ async function cleanProjectBeforeBuild(project) {
+-  await Promise.all(project.packages.map(async pkg => {
+-    await Promise.all([fs__namespace.remove(path__namespace["default"].join(pkg.directory, "dist")), ...pkg.entrypoints.filter(entrypoint => entrypoint.name !== pkg.name).map(entrypoint => {
+-      return fs__namespace.remove(path__namespace["default"].join(entrypoint.directory, "dist"));
+-    })]);
+-    await Promise.all(pkg.entrypoints.map(async entrypoint => {
+-      if (isTsPath(entrypoint.source)) {
+-        await fs__namespace.mkdir(path__namespace["default"].join(entrypoint.directory, "dist"));
+-        await writeDevTSFiles(entrypoint, (await entrypointHasDefaultExport(entrypoint, (await fs__namespace.readFile(entrypoint.source, "utf8")))));
+-      }
+-    }));
+-  }));
++  await Promise.all(
++    project.packages.map(async (pkg) => {
++      await Promise.all([
++        fs__namespace.remove(path__namespace["default"].join(pkg.directory, "dist")),
++        ...pkg.entrypoints
++          .filter((entrypoint) => entrypoint.name !== pkg.name)
++          .map((entrypoint) => {
++            return fs__namespace.remove(path__namespace["default"].join(entrypoint.directory, "dist"));
++          })
++      ]);
++      await Promise.all(
++        pkg.entrypoints.map(async (entrypoint) => {
++          if (isTsPath(entrypoint.source)) {
++            await fs__namespace.mkdir(path__namespace["default"].join(entrypoint.directory, "dist"));
++            await writeDevTSFiles(entrypoint, await entrypointHasDefaultExport(entrypoint, await fs__namespace.readFile(entrypoint.source, "utf8")));
++          }
++        })
++      );
++    })
++  );
+ }
+ 
+ function nodeDevProdEntry() {
+@@ -2284,12 +2714,11 @@ if (process.env.NODE_ENV === "production") {
+         });
+       }
+     }
+-
+   };
+ }
+ 
+ function mjsProxyPlugin(pkg) {
+-  const entrypointSources = new Set(pkg.entrypoints.map(e => e.source));
++  const entrypointSources = new Set(pkg.entrypoints.map((e) => e.source));
+   return {
+     name: "mjs-proxy",
+ 
+@@ -2299,7 +2728,12 @@ function mjsProxyPlugin(pkg) {
+       for (const n in bundle) {
+         const file = bundle[n];
+ 
+-        if (file.type === "asset" || !file.isEntry || file.facadeModuleId == null || !entrypointSources.has(normalizePath__default["default"](file.facadeModuleId))) {
++        if (
++          file.type === "asset" ||
++          !file.isEntry ||
++          file.facadeModuleId == null ||
++          !entrypointSources.has(normalizePath__default["default"](file.facadeModuleId))
++        ) {
+           continue;
+         }
+ 
+@@ -2320,7 +2754,6 @@ function mjsProxyPlugin(pkg) {
+         }
+       }
+     }
+-
+   };
+ }
+ 
+@@ -2372,11 +2805,7 @@ function babelRuntimeVersionRangeHasHelper(name, versionRange) {
+   return !semver__default["default"].intersects(`<${minVersion}`, versionRange) && !semver__default["default"].intersects(`>=8.0.0`, versionRange);
+ }
+ 
+-let rollupPluginBabel = ({
+-  cwd,
+-  reportTransformedFile,
+-  babelRuntime
+-}) => {
++let rollupPluginBabel = ({ cwd, reportTransformedFile, babelRuntime }) => {
+   // semver.intersects() has some surprising behavior with comparing ranges
+   // with pre-release versions. We add '^' to ensure that we are always
+   // comparing ranges with ranges, which sidesteps this logic.
+@@ -2394,14 +2823,21 @@ let rollupPluginBabel = ({
+   //
+   // Note: If this is found to have issues, please also revisit the logic in
+   // transform-runtime's definitions.js file.
+-  const babelRuntimeVersion = semver__default["default"].valid(babelRuntime === null || babelRuntime === void 0 ? void 0 : babelRuntime.range) ? `^${babelRuntime === null || babelRuntime === void 0 ? void 0 : babelRuntime.range}` : babelRuntime === null || babelRuntime === void 0 ? void 0 : babelRuntime.range;
+-  const resolveIdForBabelHelper = babelRuntimeVersion === undefined || babelRuntime === undefined || !semver__default["default"].validRange(babelRuntimeVersion) ? helper => `${babelHelpersModuleStart}${helper}` : helper => {
+-    if (babelRuntimeVersionRangeHasHelper(helper, babelRuntimeVersion)) {
+-      return `${babelRuntime.name}/helpers/${helper}`;
+-    }
++  const babelRuntimeVersion = semver__default["default"].valid(babelRuntime === null || babelRuntime === void 0 ? void 0 : babelRuntime.range)
++    ? `^${babelRuntime === null || babelRuntime === void 0 ? void 0 : babelRuntime.range}`
++    : babelRuntime === null || babelRuntime === void 0
++    ? void 0
++    : babelRuntime.range;
++  const resolveIdForBabelHelper =
++    babelRuntimeVersion === undefined || babelRuntime === undefined || !semver__default["default"].validRange(babelRuntimeVersion)
++      ? (helper) => `${babelHelpersModuleStart}${helper}`
++      : (helper) => {
++          if (babelRuntimeVersionRangeHasHelper(helper, babelRuntimeVersion)) {
++            return `${babelRuntime.name}/helpers/${helper}`;
++          }
+ 
+-    return `${babelHelpersModuleStart}${helper}`;
+-  };
++          return `${babelHelpersModuleStart}${helper}`;
++        };
+   return {
+     name: "babel",
+ 
+@@ -2430,11 +2866,13 @@ let rollupPluginBabel = ({
+ 
+       if (helpersSourceDescription === undefined) {
+         const helperNodes = babelHelpers.get(helperName).nodes;
+-        let helpers = babelGenerator.default( // @ts-ignore
+-        {
+-          type: "Program",
+-          body: helperNodes
+-        }).code;
++        let helpers = babelGenerator.default(
++          // @ts-ignore
++          {
++            type: "Program",
++            body: helperNodes
++          }
++        ).code;
+         helpersSourceDescription = {
+           ast: this.parse(helpers, undefined),
+           code: helpers
+@@ -2454,7 +2892,7 @@ let rollupPluginBabel = ({
+         let cachedResult = lru.get(filename);
+ 
+         if (code === cachedResult.code) {
+-          return cachedResult.promise.then(result => {
++          return cachedResult.promise.then((result) => {
+             const ast = JSON.parse(JSON.stringify(result.ast));
+             return {
+               code: result.code,
+@@ -2471,28 +2909,29 @@ let rollupPluginBabel = ({
+         }
+       }
+ 
+-      let promise = getWorker().transformBabel(code, cwd, filename).then(x => {
+-        reportTransformedFile(filename);
+-        const ast = this.parse(x.code, undefined);
+-        return {
+-          code: x.code,
+-          ast: JSON.parse(JSON.stringify(ast, (_, value) => typeof value === "bigint" ? null : value)),
+-          map: x.map,
+-          meta: {
+-            babel: {
+-              ast,
+-              codeAtBabelTime: x.code
++      let promise = getWorker()
++        .transformBabel(code, cwd, filename)
++        .then((x) => {
++          reportTransformedFile(filename);
++          const ast = this.parse(x.code, undefined);
++          return {
++            code: x.code,
++            ast: JSON.parse(JSON.stringify(ast, (_, value) => (typeof value === "bigint" ? null : value))),
++            map: x.map,
++            meta: {
++              babel: {
++                ast,
++                codeAtBabelTime: x.code
++              }
+             }
+-          }
+-        };
+-      });
++          };
++        });
+       lru.set(filename, {
+         code,
+         promise
+       });
+       return promise;
+     }
+-
+   };
+ };
+ 
+@@ -2501,35 +2940,40 @@ function terser(options) {
+     name: "terser",
+ 
+     renderChunk(code, chunk, outputOptions) {
+-      const normalizedOptions = _objectSpread(_objectSpread({}, options), {}, {
+-        module: outputOptions.format === "es"
+-      });
+-
+-      const result = getWorker().transformTerser(code, JSON.stringify(normalizedOptions)).catch(error => {
+-        const {
+-          message,
+-          line,
+-          col: column
+-        } = error;
+-        console.error(codeFrame.codeFrameColumns(code, {
+-          start: {
+-            line,
+-            column
+-          }
+-        }, {
+-          message
+-        }));
+-        throw error;
+-      });
++      const normalizedOptions = _objectSpread(
++        _objectSpread({}, options),
++        {},
++        {
++          module: outputOptions.format === "es"
++        }
++      );
++
++      const result = getWorker()
++        .transformTerser(code, JSON.stringify(normalizedOptions))
++        .catch((error) => {
++          const { message, line, col: column } = error;
++          console.error(
++            codeFrame.codeFrameColumns(
++              code,
++              {
++                start: {
++                  line,
++                  column
++                }
++              },
++              {
++                message
++              }
++            )
++          );
++          throw error;
++        });
+       return result;
+     }
+-
+   };
+ }
+ 
+-function inlineProcessEnvNodeEnv({
+-  sourceMap
+-}) {
++function inlineProcessEnvNodeEnv({ sourceMap }) {
+   return {
+     name: "inline-process-env-node-env-production",
+ 
+@@ -2552,7 +2996,20 @@ function inlineProcessEnvNodeEnv({
+             const parent = p;
+             const node = n;
+ 
+-            if (node.type === "MemberExpression" && !node.computed && node.object.type === "MemberExpression" && !node.object.computed && node.object.object.type === "Identifier" && node.object.object.name === "process" && node.object.property.type === "Identifier" && node.object.property.name === "env" && node.property.type === "Identifier" && node.property.name === "NODE_ENV" && isReference__default["default"](node, parent) && parent.type !== "AssignmentExpression") {
++            if (
++              node.type === "MemberExpression" &&
++              !node.computed &&
++              node.object.type === "MemberExpression" &&
++              !node.object.computed &&
++              node.object.object.type === "Identifier" &&
++              node.object.object.name === "process" &&
++              node.object.property.type === "Identifier" &&
++              node.object.property.name === "env" &&
++              node.property.type === "Identifier" &&
++              node.property.name === "NODE_ENV" &&
++              isReference__default["default"](node, parent) &&
++              parent.type !== "AssignmentExpression"
++            ) {
+               const start = node.start;
+               const end = node.end;
+               const len = end - start;
+@@ -2567,7 +3024,6 @@ function inlineProcessEnvNodeEnv({
+               magicString.overwrite(start, end, '"production"'.padStart(len));
+             }
+           }
+-
+         });
+         let output = {
+           code: magicString.toString(),
+@@ -2585,7 +3041,6 @@ function inlineProcessEnvNodeEnv({
+ 
+       return null;
+     }
+-
+   };
+ }
+ 
+@@ -2666,18 +3121,24 @@ function getModuleDirectives(source) {
+   return directives;
+ }
+ 
+-function serverComponentsPlugin({
+-  sourceMap
+-}) {
++function serverComponentsPlugin({ sourceMap }) {
+   return {
+     name: "server-components",
+ 
+     async resolveId(source, importer, opts) {
+       var _loaded$meta$directiv;
+ 
+-      const resolved = await this.resolve(source, importer, _objectSpread(_objectSpread({}, opts), {}, {
+-        skipSelf: true
+-      }));
++      const resolved = await this.resolve(
++        source,
++        importer,
++        _objectSpread(
++          _objectSpread({}, opts),
++          {},
++          {
++            skipSelf: true
++          }
++        )
++      );
+ 
+       if (resolved === null || resolved.external) {
+         return resolved;
+@@ -2685,9 +3146,17 @@ function serverComponentsPlugin({
+ 
+       const loaded = await this.load(resolved);
+ 
+-      if (typeof ((_loaded$meta$directiv = loaded.meta.directivePreservedFile) === null || _loaded$meta$directiv === void 0 ? void 0 : _loaded$meta$directiv.referenceId) === "string" && importer !== undefined) {
++      if (
++        typeof ((_loaded$meta$directiv = loaded.meta.directivePreservedFile) === null || _loaded$meta$directiv === void 0
++          ? void 0
++          : _loaded$meta$directiv.referenceId) === "string" &&
++        importer !== undefined
++      ) {
+         // this name is appended for Rollup naming chunks/variables in the output
+-        const name = path__namespace["default"].basename(resolved.id).replace(/\.[tj]sx?$/, "").replace(/[^\w]/g, "_");
++        const name = path__namespace["default"]
++          .basename(resolved.id)
++          .replace(/\.[tj]sx?$/, "")
++          .replace(/[^\w]/g, "_");
+         const id = `__USE_CLIENT_IMPORT__${loaded.meta.directivePreservedFile.referenceId}__USE_CLIENT_IMPORT__/${name}`;
+         return {
+           id,
+@@ -2701,7 +3170,7 @@ function serverComponentsPlugin({
+     transform(code, id) {
+       if (id.startsWith("\0")) return null;
+       const directives = getModuleDirectives(code);
+-      const directive = directives.find(d => d.value === "use client" || d.value === "use server");
++      const directive = directives.find((d) => d.value === "use client" || d.value === "use server");
+       if (!directive) return null;
+       const magicString = new MagicString__default["default"](code);
+       const referenceId = this.emitFile({
+@@ -2712,9 +3181,11 @@ function serverComponentsPlugin({
+       magicString.remove(directive.start, directive.end);
+       return {
+         code: magicString.toString(),
+-        map: sourceMap ? magicString.generateMap({
+-          hires: true
+-        }) : undefined,
++        map: sourceMap
++          ? magicString.generateMap({
++              hires: true
++            })
++          : undefined,
+         meta: {
+           directivePreservedFile: {
+             referenceId,
+@@ -2737,7 +3208,9 @@ function serverComponentsPlugin({
+       }
+ 
+       magicString.replace(/__USE_CLIENT_IMPORT__(\w+?)__USE_CLIENT_IMPORT__\/\w+/g, (_, referenceId) => {
+-        const relative = normalizePath__default["default"](path__namespace["default"].relative(path__namespace["default"].dirname(chunk.fileName), this.getFileName(referenceId)));
++        const relative = normalizePath__default["default"](
++          path__namespace["default"].relative(path__namespace["default"].dirname(chunk.fileName), this.getFileName(referenceId))
++        );
+         return relative.startsWith("../") ? relative : `./${relative}`;
+       });
+       const stringified = magicString.toString();
+@@ -2748,12 +3221,13 @@ function serverComponentsPlugin({
+ 
+       return {
+         code: magicString.toString(),
+-        map: sourceMap ? magicString.generateMap({
+-          hires: true
+-        }) : undefined
++        map: sourceMap
++          ? magicString.generateMap({
++              hires: true
++            })
++          : undefined
+       };
+     }
+-
+   };
+ }
+ 
+@@ -2771,11 +3245,18 @@ function resolveErrorsPlugin(pkg, warnings, isUmd) {
+ 
+       if (resolved === null) {
+         if (!source.startsWith(".")) {
+-          warnings.add(`"${source}" is imported ${importer ? `by "${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : ""} but the package is not specified in dependencies or peerDependencies`);
++          warnings.add(
++            `"${source}" is imported ${
++              importer ? `by "${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : ""
++            } but the package is not specified in dependencies or peerDependencies`
++          );
+           return false;
+         }
+ 
+-        throw new FatalError(`Could not resolve ${source} ` + (importer ? `from ${path__namespace["default"].relative(pkg.directory, importer)}` : ""), pkg.name);
++        throw new FatalError(
++          `Could not resolve ${source} ` + (importer ? `from ${path__namespace["default"].relative(pkg.directory, importer)}` : ""),
++          pkg.name
++        );
+       }
+ 
+       if (source.startsWith("\0") || resolved.id.startsWith("\0")) {
+@@ -2784,21 +3265,28 @@ function resolveErrorsPlugin(pkg, warnings, isUmd) {
+ 
+       if (resolved.id.startsWith(pkg.directory)) {
+         if (!resolved.external && !allowedExtensionRegex.test(resolved.id)) {
+-          warnings.add(`only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${importer ? `"${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : "a module"}`);
++          warnings.add(
++            `only .ts, .tsx, .js, .jsx, and .json files can be imported but "${source}" is imported in ${
++              importer ? `"${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : "a module"
++            }`
++          );
+           return false;
+         }
+ 
+         return resolved;
+       }
+ 
+-      if (isUmd || (_resolved$id = resolved.id) !== null && _resolved$id !== void 0 && _resolved$id.startsWith("__USE_CLIENT_IMPORT__")) {
++      if (isUmd || ((_resolved$id = resolved.id) !== null && _resolved$id !== void 0 && _resolved$id.startsWith("__USE_CLIENT_IMPORT__"))) {
+         return resolved;
+       }
+ 
+-      warnings.add(`all relative imports in a package should only import modules inside of their package directory but ${importer ? `"${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : "a module"} is importing "${source}"`);
++      warnings.add(
++        `all relative imports in a package should only import modules inside of their package directory but ${
++          importer ? `"${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, importer))}"` : "a module"
++        } is importing "${source}"`
++      );
+       return false;
+     }
+-
+   };
+ }
+ 
+@@ -2815,7 +3303,10 @@ function flow() {
+         }
+ 
+         let mainFieldPath = file.fileName.replace(/(?:\.prod)?\.js$/, ".js");
+-        let relativeToSource = path__namespace["default"].relative(path__namespace["default"].dirname(path__namespace["default"].join(opts.dir, file.fileName)), file.facadeModuleId);
++        let relativeToSource = path__namespace["default"].relative(
++          path__namespace["default"].dirname(path__namespace["default"].join(opts.dir, file.fileName)),
++          file.facadeModuleId
++        );
+         let isEntrySourceTypeScript = /\.tsx?$/.test(file.facadeModuleId);
+ 
+         if (!isEntrySourceTypeScript) {
+@@ -2838,18 +3329,17 @@ function flow() {
+         }
+       }
+     }
+-
+   };
+ }
+ 
+ // this makes sure nested imports of external packages are external
+-const makeExternalPredicate = externalArr => {
++const makeExternalPredicate = (externalArr) => {
+   if (externalArr.length === 0) {
+     return () => false;
+   }
+ 
+   const pattern = new RegExp(`^(${externalArr.join("|")})($|/)`);
+-  return id => pattern.test(id);
++  return (id) => pattern.test(id);
+ };
+ 
+ let getRollupConfig = (pkg, entrypoints, options, reportTransformedFile) => {
+@@ -2867,27 +3357,33 @@ let getRollupConfig = (pkg, entrypoints, options, reportTransformedFile) => {
+ 
+   external.push(pkg.name);
+ 
+-  let wrapExternalPredicate = inner => inner;
++  let wrapExternalPredicate = (inner) => inner;
+ 
+   if (options.kind === "node-dev" || options.kind === "node-prod" || options.kind === "conditions") {
+     external.push(...builtInModules__default["default"]);
+ 
+-    wrapExternalPredicate = inner => source => source.startsWith("node:") || inner(source);
++    wrapExternalPredicate = (inner) => (source) => source.startsWith("node:") || inner(source);
+   }
+ 
+   let input = {};
+-  entrypoints.forEach(entrypoint => {
+-    input[path__namespace["default"].relative(pkg.directory, path__namespace["default"].join(entrypoint.directory, "dist", getBaseDistName(entrypoint)))] = entrypoint.source;
++  entrypoints.forEach((entrypoint) => {
++    input[
++      path__namespace["default"].relative(pkg.directory, path__namespace["default"].join(entrypoint.directory, "dist", getBaseDistName(entrypoint)))
++    ] = entrypoint.source;
+   });
+   let warnings = new Set();
+   const isDefaultConditionsBuild = options.kind === "conditions" && options.conditions.length === 0;
+   const config = {
+     input,
+     external: wrapExternalPredicate(makeExternalPredicate(external)),
+-    onwarn: warning => {
++    onwarn: (warning) => {
+       if (typeof warning === "string") {
+-        warnings.add(`An unhandled Rollup error occurred: ${chalk__default["default"].red( // @ts-ignore
+-        warning.toString())}`);
++        warnings.add(
++          `An unhandled Rollup error occurred: ${chalk__default["default"].red(
++            // @ts-ignore
++            warning.toString()
++          )}`
++        );
+         return;
+       }
+ 
+@@ -2895,95 +3391,129 @@ let getRollupConfig = (pkg, entrypoints, options, reportTransformedFile) => {
+         case "CIRCULAR_DEPENDENCY":
+         case "EMPTY_BUNDLE":
+         case "EVAL":
+-        case "UNUSED_EXTERNAL_IMPORT":
+-          {
+-            break;
+-          }
+-
+-        case "THIS_IS_UNDEFINED":
+-          {
+-            if (options.kind === "umd") {
+-              return;
+-            }
++        case "UNUSED_EXTERNAL_IMPORT": {
++          break;
++        }
+ 
+-            warnings.add(`"${normalizePath__default["default"](path__namespace["default"].relative(pkg.directory, warning.loc.file))}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${warning.url} and fix this issue that has happened here:\n\n${warning.frame}\n`);
++        case "THIS_IS_UNDEFINED": {
++          if (options.kind === "umd") {
+             return;
+           }
+ 
+-        default:
+-          {
+-            warnings.add(`An unhandled Rollup error occurred: ${chalk__default["default"].red(warning.toString())}`);
+-          }
+-      }
+-    },
+-    plugins: [{
+-      name: "throw-warnings",
++          warnings.add(
++            `"${normalizePath__default["default"](
++              path__namespace["default"].relative(pkg.directory, warning.loc.file)
++            )}" used \`this\` keyword at the top level of an ES module. You can read more about this at ${
++              warning.url
++            } and fix this issue that has happened here:\n\n${warning.frame}\n`
++          );
++          return;
++        }
+ 
+-      buildEnd() {
+-        if (warnings.size) {
+-          throw new BatchError([...warnings].map(x => new FatalError(x, pkg.name)));
++        default: {
++          warnings.add(`An unhandled Rollup error occurred: ${chalk__default["default"].red(warning.toString())}`);
+         }
+       }
++    },
++    plugins: [
++      {
++        name: "throw-warnings",
+ 
+-    }, options.kind === "node-prod" && nodeDevProdEntry(), (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(), resolveErrorsPlugin(pkg, warnings, options.kind === "umd"), (options.kind === "node-prod" || isDefaultConditionsBuild) && typescriptDeclarations(pkg), (options.kind === "node-prod" || options.kind === "conditions") && ((_pkg$exportsFieldConf = pkg.exportsFieldConfig()) === null || _pkg$exportsFieldConf === void 0 ? void 0 : _pkg$exportsFieldConf.importConditionDefaultExport) === "default" && mjsProxyPlugin(pkg), serverComponentsPlugin({
+-      sourceMap: options.kind === "umd"
+-    }), rollupPluginBabel({
+-      cwd: pkg.project.directory,
+-      reportTransformedFile,
+-      babelRuntime: (() => {
+-        for (const dep of ["@babel/runtime", "@babel/runtime-corejs2", "@babel/runtime-corejs3"]) {
+-          var _pkg$json$dependencie;
+-
+-          const range = (_pkg$json$dependencie = pkg.json.dependencies) === null || _pkg$json$dependencie === void 0 ? void 0 : _pkg$json$dependencie[dep];
+-
+-          if (range !== undefined) {
+-            return {
+-              range,
+-              name: dep
+-            };
++        buildEnd() {
++          if (warnings.size) {
++            throw new BatchError([...warnings].map((x) => new FatalError(x, pkg.name)));
+           }
+         }
+-      })()
+-    }), options.kind === "umd" && cjs__default["default"]({
+-      include: ["**/node_modules/**", "node_modules/**"]
+-    }), rewriteBabelRuntimeHelpers(), json__default["default"]({
+-      namedExports: false
+-    }), options.kind === "umd" && alias__default["default"]({
+-      entries: getAliases(pkg.project)
+-    }), resolve__default["default"]({
+-      extensions: EXTENSIONS,
+-      exportConditions: options.kind === "conditions" ? options.conditions : undefined,
+-      // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
+-      browser: options.kind === "umd",
+-      moduleDirectories: options.kind === "umd" ? ["node_modules"] : []
+-    }), options.kind === "umd" && inlineProcessEnvNodeEnv({
+-      sourceMap: true
+-    }), options.kind === "umd" && terser({
+-      sourceMap: true,
+-      compress: true
+-    }), options.kind === "node-prod" && inlineProcessEnvNodeEnv({
+-      sourceMap: false
+-    }), (options.kind === "browser" || options.kind === "umd") && replace__default["default"]({
+-      values: {
+-        ["typeof " + "document"]: JSON.stringify("object"),
+-        ["typeof " + "window"]: JSON.stringify("object")
+-      },
+-      preventAssignment: true
+-    }), options.kind === "worker" && replace__default["default"]({
+-      values: {
+-        ["typeof " + "document"]: JSON.stringify("undefined"),
+-        ["typeof " + "window"]: JSON.stringify("undefined")
+       },
+-      preventAssignment: true
+-    }), pkg.project.experimentalFlags.keepDynamicImportAsDynamicImportInCommonJS && cjsDynamicImportPlugin].filter(x => !!x)
++      options.kind === "node-prod" && nodeDevProdEntry(),
++      (options.kind === "node-prod" || isDefaultConditionsBuild) && flow(),
++      resolveErrorsPlugin(pkg, warnings, options.kind === "umd"),
++      (options.kind === "node-prod" || isDefaultConditionsBuild) && typescriptDeclarations(pkg),
++      (options.kind === "node-prod" || options.kind === "conditions") &&
++        ((_pkg$exportsFieldConf = pkg.exportsFieldConfig()) === null || _pkg$exportsFieldConf === void 0
++          ? void 0
++          : _pkg$exportsFieldConf.importConditionDefaultExport) === "default" &&
++        mjsProxyPlugin(pkg),
++      serverComponentsPlugin({
++        sourceMap: options.kind === "umd"
++      }),
++      rollupPluginBabel({
++        cwd: pkg.project.directory,
++        reportTransformedFile,
++        babelRuntime: (() => {
++          for (const dep of ["@babel/runtime", "@babel/runtime-corejs2", "@babel/runtime-corejs3"]) {
++            var _pkg$json$dependencie;
++
++            const range =
++              (_pkg$json$dependencie = pkg.json.dependencies) === null || _pkg$json$dependencie === void 0 ? void 0 : _pkg$json$dependencie[dep];
++
++            if (range !== undefined) {
++              return {
++                range,
++                name: dep
++              };
++            }
++          }
++        })()
++      }),
++      options.kind === "umd" &&
++        cjs__default["default"]({
++          include: ["**/node_modules/**", "node_modules/**"]
++        }),
++      rewriteBabelRuntimeHelpers(),
++      json__default["default"]({
++        namedExports: false
++      }),
++      options.kind === "umd" &&
++        alias__default["default"]({
++          entries: getAliases(pkg.project)
++        }),
++      resolve__default["default"]({
++        extensions: EXTENSIONS,
++        exportConditions: options.kind === "conditions" ? options.conditions : undefined,
++        // only umd builds will actually load dependencies which is where this browser flag actually makes a difference
++        browser: options.kind === "umd",
++        moduleDirectories: options.kind === "umd" ? ["node_modules"] : []
++      }),
++      options.kind === "umd" &&
++        inlineProcessEnvNodeEnv({
++          sourceMap: true
++        }),
++      options.kind === "umd" &&
++        terser({
++          sourceMap: true,
++          compress: true
++        }),
++      options.kind === "node-prod" &&
++        inlineProcessEnvNodeEnv({
++          sourceMap: false
++        }),
++      (options.kind === "browser" || options.kind === "umd") &&
++        replace__default["default"]({
++          values: {
++            ["typeof " + "document"]: JSON.stringify("object"),
++            ["typeof " + "window"]: JSON.stringify("object")
++          },
++          preventAssignment: true
++        }),
++      options.kind === "worker" &&
++        replace__default["default"]({
++          values: {
++            ["typeof " + "document"]: JSON.stringify("undefined"),
++            ["typeof " + "window"]: JSON.stringify("undefined")
++          },
++          preventAssignment: true
++        }),
++      pkg.project.experimentalFlags.keepDynamicImportAsDynamicImportInCommonJS && cjsDynamicImportPlugin
++    ].filter((x) => !!x)
+   };
+   return config;
+ };
+ 
+ function getAliases(project) {
+   let aliases = {};
+-  project.packages.forEach(pkg => {
+-    pkg.entrypoints.forEach(entrypoint => {
++  project.packages.forEach((pkg) => {
++    pkg.entrypoints.forEach((entrypoint) => {
+       aliases[entrypoint.name] = entrypoint.source;
+     });
+   });
+@@ -2993,16 +3523,13 @@ function getAliases(project) {
+ const cjsDynamicImportPlugin = {
+   name: "cjs render dynamic import",
+ 
+-  renderDynamicImport({
+-    format
+-  }) {
++  renderDynamicImport({ format }) {
+     if (format !== "cjs") return;
+     return {
+       left: "import(",
+       right: ")"
+     };
+   }
+-
+ };
+ 
+ function getGlobal(project, name) {
+@@ -3021,27 +3548,29 @@ function getGlobal(project, name) {
+       }
+     }
+ 
+-    throw limit(() => (async () => {
+-      // if while we were waiting, that global was added, return
+-      if (project.json.preconstruct.globals !== undefined && project.json.preconstruct.globals[name]) {
+-        return;
+-      }
++    throw limit(() =>
++      (async () => {
++        // if while we were waiting, that global was added, return
++        if (project.json.preconstruct.globals !== undefined && project.json.preconstruct.globals[name]) {
++          return;
++        }
+ 
+-      let response = await doPromptInput(`What should the umdName of ${name} be?`, project);
++        let response = await doPromptInput(`What should the umdName of ${name} be?`, project);
+ 
+-      if (!project.json.preconstruct.globals) {
+-        project.json.preconstruct.globals = {};
+-      }
++        if (!project.json.preconstruct.globals) {
++          project.json.preconstruct.globals = {};
++        }
+ 
+-      project.json.preconstruct.globals[name] = response;
+-      await project.save();
+-    })());
++        project.json.preconstruct.globals[name] = response;
++        await project.save();
++      })()
++    );
+   }
+ }
+ 
+ const babelHelperId = /@babel\/runtime(|-corejs[23])\/helpers\//;
+ 
+-const interop = id => id && babelHelperId.test(id) ? "default" : "auto";
++const interop = (id) => (id && babelHelperId.test(id) ? "default" : "auto");
+ 
+ function getRollupConfigs(pkg) {
+   let configs = umdBuilds(pkg);
+@@ -3050,25 +3579,35 @@ function getRollupConfigs(pkg) {
+   if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "imports") {
+     for (const conditions of exportsFieldConfig.conditions.groups.keys()) {
+       configs.push({
+-        config: getRollupConfig(pkg, pkg.entrypoints, {
+-          kind: "conditions",
+-          conditions
+-        }, pkg.project.experimentalFlags.logCompiledFiles ? filename => {
+-          info("compiled " + filename.replace(pkg.project.directory + path__namespace["default"].sep, ""));
+-        } : () => {}),
+-        outputs: [{
+-          format: "cjs",
+-          entryFileNames: `[name].${getDistExtensionForConditions(conditions)}`,
+-          chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(conditions)}`,
+-          dir: pkg.directory,
+-          exports: "named",
+-          interop
+-        }, {
+-          format: "es",
+-          entryFileNames: `[name].${getDistExtensionForConditions(conditions.concat("module"))}`,
+-          chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(conditions.concat("module"))}`,
+-          dir: pkg.directory
+-        }]
++        config: getRollupConfig(
++          pkg,
++          pkg.entrypoints,
++          {
++            kind: "conditions",
++            conditions
++          },
++          pkg.project.experimentalFlags.logCompiledFiles
++            ? (filename) => {
++                info("compiled " + filename.replace(pkg.project.directory + path__namespace["default"].sep, ""));
++              }
++            : () => {}
++        ),
++        outputs: [
++          {
++            format: "cjs",
++            entryFileNames: `[name].${getDistExtensionForConditions(conditions)}`,
++            chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(conditions)}`,
++            dir: pkg.directory,
++            exports: "named",
++            interop
++          },
++          {
++            format: "es",
++            entryFileNames: `[name].${getDistExtensionForConditions(conditions.concat("module"))}`,
++            chunkFileNames: `dist/[name]-[hash].${getDistExtensionForConditions(conditions.concat("module"))}`,
++            dir: pkg.directory
++          }
++        ]
+       });
+     }
+ 
+@@ -3077,73 +3616,113 @@ function getRollupConfigs(pkg) {
+ 
+   let hasModuleField = pkg.entrypoints[0].json.module !== undefined;
+   configs.push({
+-    config: getRollupConfig(pkg, pkg.entrypoints, {
+-      kind: "node-dev"
+-    }, pkg.project.experimentalFlags.logCompiledFiles ? filename => {
+-      info("compiled " + filename.replace(pkg.project.directory + path__namespace["default"].sep, ""));
+-    } : () => {}),
+-    outputs: [{
+-      format: "cjs",
+-      entryFileNames: "[name].cjs.dev.js",
+-      chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
+-      dir: pkg.directory,
+-      exports: "named",
+-      interop
+-    }, ...(hasModuleField ? [{
+-      format: "es",
+-      entryFileNames: `[name].${getDistExtension("esm")}`,
+-      chunkFileNames: `dist/[name]-[hash].${getDistExtension("esm")}`,
+-      dir: pkg.directory
+-    }] : [])]
++    config: getRollupConfig(
++      pkg,
++      pkg.entrypoints,
++      {
++        kind: "node-dev"
++      },
++      pkg.project.experimentalFlags.logCompiledFiles
++        ? (filename) => {
++            info("compiled " + filename.replace(pkg.project.directory + path__namespace["default"].sep, ""));
++          }
++        : () => {}
++    ),
++    outputs: [
++      {
++        format: "cjs",
++        entryFileNames: "[name].cjs.dev.js",
++        chunkFileNames: "dist/[name]-[hash].cjs.dev.js",
++        dir: pkg.directory,
++        exports: "named",
++        interop
++      },
++      ...(hasModuleField
++        ? [
++            {
++              format: "es",
++              entryFileNames: `[name].${getDistExtension("esm")}`,
++              chunkFileNames: `dist/[name]-[hash].${getDistExtension("esm")}`,
++              dir: pkg.directory
++            }
++          ]
++        : [])
++    ]
+   });
+   configs.push({
+-    config: getRollupConfig(pkg, pkg.entrypoints, {
+-      kind: "node-prod"
+-    }, () => {}),
+-    outputs: [{
+-      format: "cjs",
+-      entryFileNames: "[name].cjs.prod.js",
+-      chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
+-      dir: pkg.directory,
+-      exports: "named",
+-      interop
+-    }]
++    config: getRollupConfig(
++      pkg,
++      pkg.entrypoints,
++      {
++        kind: "node-prod"
++      },
++      () => {}
++    ),
++    outputs: [
++      {
++        format: "cjs",
++        entryFileNames: "[name].cjs.prod.js",
++        chunkFileNames: "dist/[name]-[hash].cjs.prod.js",
++        dir: pkg.directory,
++        exports: "named",
++        interop
++      }
++    ]
+   });
+   let hasBrowserField = pkg.entrypoints[0].json.browser !== undefined;
+ 
+   if (hasBrowserField) {
+     configs.push({
+-      config: getRollupConfig(pkg, pkg.entrypoints, {
+-        kind: "browser"
+-      }, () => {}),
+-      outputs: [!exportsFieldConfig && {
+-        format: "cjs",
+-        entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
+-        chunkFileNames: `dist/[name]-[hash].${getDistExtension("browser-cjs")}`,
+-        dir: pkg.directory,
+-        exports: "named",
+-        interop
+-      }, hasModuleField && {
+-        format: "es",
+-        entryFileNames: `[name].${getDistExtension("browser-esm")}`,
+-        chunkFileNames: `dist/[name]-[hash].${getDistExtension("browser-esm")}`,
+-        dir: pkg.directory
+-      }].filter(value => value !== false)
++      config: getRollupConfig(
++        pkg,
++        pkg.entrypoints,
++        {
++          kind: "browser"
++        },
++        () => {}
++      ),
++      outputs: [
++        !exportsFieldConfig && {
++          format: "cjs",
++          entryFileNames: `[name].${getDistExtension("browser-cjs")}`,
++          chunkFileNames: `dist/[name]-[hash].${getDistExtension("browser-cjs")}`,
++          dir: pkg.directory,
++          exports: "named",
++          interop
++        },
++        hasModuleField && {
++          format: "es",
++          entryFileNames: `[name].${getDistExtension("browser-esm")}`,
++          chunkFileNames: `dist/[name]-[hash].${getDistExtension("browser-esm")}`,
++          dir: pkg.directory
++        }
++      ].filter((value) => value !== false)
+     });
+   } // note module builds always exist when using the exports field
+ 
+-
+-  if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "legacy" && exportsFieldConfig !== null && exportsFieldConfig !== void 0 && exportsFieldConfig.conditions.envs.has("worker")) {
++  if (
++    (exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "legacy" &&
++    exportsFieldConfig !== null &&
++    exportsFieldConfig !== void 0 &&
++    exportsFieldConfig.conditions.envs.has("worker")
++  ) {
+     configs.push({
+-      config: getRollupConfig(pkg, pkg.entrypoints, {
+-        kind: "worker"
+-      }, () => {}),
+-      outputs: [{
+-        format: "es",
+-        entryFileNames: `[name].${getDistExtension("worker")}`,
+-        chunkFileNames: `dist/[name]-[hash].${getDistExtension("worker")}`,
+-        dir: pkg.directory
+-      }]
++      config: getRollupConfig(
++        pkg,
++        pkg.entrypoints,
++        {
++          kind: "worker"
++        },
++        () => {}
++      ),
++      outputs: [
++        {
++          format: "es",
++          entryFileNames: `[name].${getDistExtension("worker")}`,
++          chunkFileNames: `dist/[name]-[hash].${getDistExtension("worker")}`,
++          dir: pkg.directory
++        }
++      ]
+     });
+   }
+ 
+@@ -3154,28 +3733,36 @@ function umdBuilds(pkg) {
+   // umd builds are a bit special
+   // we don't guarantee that shared modules are shared across umd builds
+   // this is just like dependencies, they're bundled into the umd build
+-  if (pkg.entrypoints[0].json["umd:main"] !== undefined) return pkg.entrypoints.map(entrypoint => {
+-    return {
+-      config: getRollupConfig(pkg, [entrypoint], {
+-        kind: "umd"
+-      }, () => {}),
+-      outputs: [{
+-        format: "umd",
+-        sourcemap: true,
+-        entryFileNames: `[name].${getDistExtension("umd")}`,
+-        name: entrypoint.json.preconstruct.umdName,
+-        dir: pkg.directory,
+-        interop,
+-        globals: name => {
+-          if (name === entrypoint.json.preconstruct.umdName) {
+-            return name;
+-          }
++  if (pkg.entrypoints[0].json["umd:main"] !== undefined)
++    return pkg.entrypoints.map((entrypoint) => {
++      return {
++        config: getRollupConfig(
++          pkg,
++          [entrypoint],
++          {
++            kind: "umd"
++          },
++          () => {}
++        ),
++        outputs: [
++          {
++            format: "umd",
++            sourcemap: true,
++            entryFileNames: `[name].${getDistExtension("umd")}`,
++            name: entrypoint.json.preconstruct.umdName,
++            dir: pkg.directory,
++            interop,
++            globals: (name) => {
++              if (name === entrypoint.json.preconstruct.umdName) {
++                return name;
++              }
+ 
+-          return getGlobal(pkg.project, name);
+-        }
+-      }]
+-    };
+-  });
++              return getGlobal(pkg.project, name);
++            }
++          }
++        ]
++      };
++    });
+   return [];
+ }
+ 
+@@ -3186,7 +3773,10 @@ let SOURCEMAPPING_URL = "sourceMa";
+ SOURCEMAPPING_URL += "ppingURL"; // https://github.com/rollup/rollup/blob/28ffcf4c4a2ab4323091f63944b2a609b7bcd701/src/rollup/rollup.ts#L333-L356
+ 
+ function writeOutputFile(outputFile, outputOptions) {
+-  const fileName = path__namespace["default"].resolve(outputOptions.dir || path__namespace["default"].dirname(outputOptions.file), outputFile.fileName);
++  const fileName = path__namespace["default"].resolve(
++    outputOptions.dir || path__namespace["default"].dirname(outputOptions.file),
++    outputFile.fileName
++  );
+   let writeSourceMapPromise;
+   let source;
+ 
+@@ -3216,25 +3806,32 @@ function writeOutputFile(outputFile, outputOptions) {
+ 
+ async function buildPackage(pkg) {
+   let configs = getRollupConfigs(pkg);
+-  let outputs = await Promise.all(configs.map(async ({
+-    config,
+-    outputs
+-  }) => {
+-    let bundle = await rollup.rollup(config);
+-    return Promise.all(outputs.map(async outputConfig => {
+-      return {
+-        output: (await bundle.generate(outputConfig)).output,
+-        outputConfig
+-      };
+-    }));
+-  }));
+-  await Promise.all(outputs.map(x => {
+-    return Promise.all(x.map(bundle => {
+-      return Promise.all(bundle.output.map(output => {
+-        return writeOutputFile(output, bundle.outputConfig);
+-      }));
+-    }));
+-  }));
++  let outputs = await Promise.all(
++    configs.map(async ({ config, outputs }) => {
++      let bundle = await rollup.rollup(config);
++      return Promise.all(
++        outputs.map(async (outputConfig) => {
++          return {
++            output: (await bundle.generate(outputConfig)).output,
++            outputConfig
++          };
++        })
++      );
++    })
++  );
++  await Promise.all(
++    outputs.map((x) => {
++      return Promise.all(
++        x.map((bundle) => {
++          return Promise.all(
++            bundle.output.map((output) => {
++              return writeOutputFile(output, bundle.outputConfig);
++            })
++          );
++        })
++      );
++    })
++  );
+ }
+ 
+ async function retryableBuild(pkg) {
+@@ -3268,17 +3865,19 @@ async function build$1(directory) {
+     info("building bundles!");
+     await cleanProjectBeforeBuild(project);
+     let errors = [];
+-    await Promise.all(project.packages.map(async pkg => {
+-      try {
+-        await retryableBuild(pkg);
+-      } catch (err) {
+-        if (err instanceof BatchError) {
+-          errors.push(...err.errors);
+-        } else {
+-          errors.push(err);
++    await Promise.all(
++      project.packages.map(async (pkg) => {
++        try {
++          await retryableBuild(pkg);
++        } catch (err) {
++          if (err instanceof BatchError) {
++            errors.push(...err.errors);
++          } else {
++            errors.push(err);
++          }
+         }
+-      }
+-    }));
++      })
++    );
+ 
+     if (errors.length) {
+       throw new BatchError(errors.sort((a, b) => (a.scope + a.message).localeCompare(b.scope + b.message)));
+@@ -3294,13 +3893,17 @@ function relativePath(id) {
+   return path__namespace["default"].relative(process.cwd(), id);
+ }
+ 
+-async function watchPackage(pkg) {
++async function watchPackage(pkg, onSuccessWatch) {
+   const _configs = getRollupConfigs(pkg);
+ 
+-  let configs = _configs.map(config => {
+-    return _objectSpread(_objectSpread({}, config.config), {}, {
+-      output: config.outputs
+-    });
++  let configs = _configs.map((config) => {
++    return _objectSpread(
++      _objectSpread({}, config.config),
++      {},
++      {
++        output: config.outputs
++      }
++    );
+   });
+ 
+   const watcher = rollup.watch(configs);
+@@ -3309,39 +3912,72 @@ async function watchPackage(pkg) {
+     reject = _reject;
+   });
+   let startResolve;
+-  let startPromise = new Promise(resolve => {
++  let startPromise = new Promise((resolve) => {
+     startResolve = resolve;
+   });
+-  watcher.on("event", event => {
++  watcher.on("event", async (event) => {
+     // https://github.com/rollup/rollup/blob/aed954e4e6e8beabd47268916ff0955fbb20682d/bin/src/run/watch.ts#L71-L115
+     switch (event.code) {
+-      case "ERROR":
+-        {
+-          reject(event.error);
+-          break;
+-        }
++      case "ERROR": {
++        reject(event.error);
++        break;
++      }
+ 
+       case "START":
+         startResolve();
+         break;
+ 
+-      case "BUNDLE_START":
+-        {
+-          info(chalk__default["default"].cyan(`bundles ${chalk__default["default"].bold(typeof event.input === "string" ? relativePath(event.input) : Array.isArray(event.input) ? event.input.map(relativePath).join(", ") : event.input === undefined ? "" : Object.values(event.input) // @ts-ignore
+-          .map(relativePath).join(", "))} → ${chalk__default["default"].bold(event.output.map(relativePath).join(", "))}...`), pkg.name);
+-          break;
+-        }
++      case "BUNDLE_START": {
++        info(
++          chalk__default["default"].cyan(
++            `bundles ${chalk__default["default"].bold(
++              typeof event.input === "string"
++                ? relativePath(event.input)
++                : Array.isArray(event.input)
++                ? event.input.map(relativePath).join(", ")
++                : event.input === undefined
++                ? ""
++                : Object.values(event.input) // @ts-ignore
++                    .map(relativePath)
++                    .join(", ")
++            )} → ${chalk__default["default"].bold(event.output.map(relativePath).join(", "))}...`
++          ),
++          pkg.name
++        );
++        break;
++      }
+ 
+-      case "BUNDLE_END":
+-        {
+-          info(chalk__default["default"].green(`created ${chalk__default["default"].bold(event.output.map(relativePath).join(", "))} in ${chalk__default["default"].bold(ms__default["default"](event.duration))}`), pkg.name);
+-          break;
+-        }
++      case "BUNDLE_END": {
++        info(
++          chalk__default["default"].green(
++            `created ${chalk__default["default"].bold(event.output.map(relativePath).join(", "))} in ${chalk__default["default"].bold(
++              ms__default["default"](event.duration)
++            )}`
++          ),
++          pkg.name
++        );
++        break;
++      }
+ 
+-      case "END":
+-        {
+-          info("waiting for changes...", pkg.name);
++      case "END": {
++        info("waiting for changes...", pkg.name);
++        try {
++          let onSuccessCommand = onSuccessWatch;
++          const hasPackageVar = onSuccessWatch.includes("%pkg%");
++          if (hasPackageVar) {
++            onSuccessCommand = onSuccessWatch.replace("%pkg%", pkg.name);
++          }
++
++          const { stdout, stderr } = await exec(onSuccessCommand);
++          if (stdout) info(stdout, pkg.name);
++          if (stderr) error(stderr, pkg.name);
++        } catch (e) {
++          error("error triggering onSuccess flag", pkg.name);
++          console.log(e);
++
++          process.exit(1);
+         }
++      }
+     }
+   });
+   return {
+@@ -3350,12 +3986,9 @@ async function watchPackage(pkg) {
+   };
+ }
+ 
+-async function retryableWatch(pkg, getPromises, depth) {
++async function retryableWatch(pkg, getPromises, depth, onSuccessWatch) {
+   try {
+-    let {
+-      error,
+-      start
+-    } = await watchPackage(pkg);
++    let { error, start } = await watchPackage(pkg, onSuccessWatch);
+ 
+     if (depth === 0) {
+       getPromises({
+@@ -3367,7 +4000,7 @@ async function retryableWatch(pkg, getPromises, depth) {
+   } catch (err) {
+     if (err instanceof Promise) {
+       await err;
+-      await retryableWatch(pkg, getPromises, depth + 1);
++      await retryableWatch(pkg, getPromises, depth + 1, onSuccessWatch);
+       return;
+     }
+ 
+@@ -3375,22 +4008,29 @@ async function retryableWatch(pkg, getPromises, depth) {
+   }
+ }
+ 
+-async function build(directory) {
++async function build(directory, onSuccessWatch) {
+   createWorker();
+   let project = await Project.create(directory);
+   validateProject(project);
+   await cleanProjectBeforeBuild(project);
+   let startCount = 0;
+-  await Promise.all(project.packages.map(pkg => retryableWatch(pkg, async ({
+-    start
+-  }) => {
+-    await start;
+-    startCount++;
+-
+-    if (startCount === project.packages.length) {
+-      success(successes.startedWatching);
+-    }
+-  }, 0)));
++  await Promise.all(
++    project.packages.map((pkg) =>
++      retryableWatch(
++        pkg,
++        async ({ start }) => {
++          await start;
++          startCount++;
++
++          if (startCount === project.packages.length) {
++            success(successes.startedWatching);
++          }
++        },
++        0,
++        onSuccessWatch
++      )
++    )
++  );
+ }
+ 
+ let keys = Object.keys;
+@@ -3403,9 +4043,9 @@ async function fixPackage(pkg) {
+   const exportsFieldConfig = pkg.exportsFieldConfig();
+   let fields = {
+     main: true,
+-    module: pkg.entrypoints.some(x => x.json.module !== undefined) || !!exportsFieldConfig,
+-    "umd:main": pkg.entrypoints.some(x => x.json["umd:main"] !== undefined),
+-    browser: pkg.entrypoints.some(x => x.json.browser !== undefined)
++    module: pkg.entrypoints.some((x) => x.json.module !== undefined) || !!exportsFieldConfig,
++    "umd:main": pkg.entrypoints.some((x) => x.json["umd:main"] !== undefined),
++    browser: pkg.entrypoints.some((x) => x.json.browser !== undefined)
+   };
+ 
+   if ((exportsFieldConfig === null || exportsFieldConfig === void 0 ? void 0 : exportsFieldConfig.conditions.kind) === "legacy") {
+@@ -3426,9 +4066,11 @@ async function fixPackage(pkg) {
+     }
+   }
+ 
+-  keys(fields).filter(x => fields[x]).forEach(field => {
+-    pkg.setFieldOnEntrypoints(field);
+-  });
++  keys(fields)
++    .filter((x) => fields[x])
++    .forEach((field) => {
++      pkg.setFieldOnEntrypoints(field);
++    });
+   pkg.json = setFieldInOrder(pkg.json, "exports", exportsField(pkg));
+ 
+   for (const entrypoint of pkg.entrypoints) {
+@@ -3438,7 +4080,8 @@ async function fixPackage(pkg) {
+     }
+   }
+ 
+-  return async () => (await Promise.all([pkg.save(), ...pkg.entrypoints.map(x => x.directory !== pkg.directory ? x.save() : false)])).some(x => x);
++  return async () =>
++    (await Promise.all([pkg.save(), ...pkg.entrypoints.map((x) => (x.directory !== pkg.directory ? x.save() : false))])).some((x) => x);
+ }
+ 
+ async function fix(directory) {
+@@ -3447,7 +4090,7 @@ async function fix(directory) {
+ 
+   if (project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH) {
+     let errors = [];
+-    Object.keys(project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH).forEach(key => {
++    Object.keys(project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH).forEach((key) => {
+       if (FORMER_FLAGS_THAT_ARE_ENABLED_NOW.has(key)) {
+         didModifyProject = true;
+         delete project.json.preconstruct.___experimentalFlags_WILL_CHANGE_IN_PATCH[key];
+@@ -3470,14 +4113,13 @@ async function fix(directory) {
+   }
+ 
+   const updaters = await Promise.all(project.packages.map(fixPackage));
+-  const didModifyPackages = (await Promise.all(updaters.map(x => x()))).some(x => x);
++  const didModifyPackages = (await Promise.all(updaters.map((x) => x()))).some((x) => x);
+   success(didModifyProject || didModifyPackages ? "fixed project!" : "project already valid!");
+ }
+ 
+ process.env.NODE_ENV = "production";
+-let {
+-  input
+-} = meow__default["default"](`
++let { input, flags } = meow__default["default"](
++  `
+ Usage
+   $ preconstruct [command]
+ Commands
+@@ -3488,7 +4130,9 @@ Commands
+   fix          infer as much information as possible and fix the project
+   dev          create links so entrypoints can be imported
+ 
+-`, {});
++`,
++  {}
++);
+ let errors = {
+   commandNotFound: "Command not found"
+ };
+@@ -3498,51 +4142,44 @@ class CommandNotFoundError extends Error {}
+ (async () => {
+   if (input.length === 1) {
+     switch (input[0]) {
+-      case "init":
+-        {
+-          await init(process.cwd());
+-          return;
+-        }
++      case "init": {
++        await init(process.cwd());
++        return;
++      }
+ 
+-      case "validate":
+-        {
+-          await validate(process.cwd());
+-          return;
+-        }
++      case "validate": {
++        await validate(process.cwd());
++        return;
++      }
+ 
+-      case "build":
+-        {
+-          await build$1(process.cwd());
+-          return;
+-        }
++      case "build": {
++        await build$1(process.cwd());
++        return;
++      }
+ 
+-      case "watch":
+-        {
+-          await build(process.cwd());
+-          return;
+-        }
++      case "watch": {
++        await build(process.cwd(), flags.onSuccess);
++        return;
++      }
+ 
+-      case "fix":
+-        {
+-          await fix(process.cwd());
+-          return;
+-        }
++      case "fix": {
++        await fix(process.cwd());
++        return;
++      }
+ 
+-      case "dev":
+-        {
+-          await dev(process.cwd());
+-          return;
+-        }
++      case "dev": {
++        await dev(process.cwd());
++        return;
++      }
+ 
+-      default:
+-        {
+-          throw new CommandNotFoundError();
+-        }
++      default: {
++        throw new CommandNotFoundError();
++      }
+     }
+   } else {
+     throw new CommandNotFoundError();
+   }
+-})().catch(err => {
++})().catch((err) => {
+   let hasFixableError = false;
+ 
+   if (err instanceof FixableError) {
